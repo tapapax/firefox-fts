@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+
+<vbox xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+  <setting type="bool" pref="extensions.tabswitcher@volinsky.net.openkey.alt" title="Alt"/>
+  <setting type="bool" pref="extensions.tabswitcher@volinsky.net.openkey.shift" title="Shift"/>
+  <setting type="bool" pref="extensions.tabswitcher@volinsky.net.openkey.control" title="Control"/>
+  <setting type="menulist" pref="extensions.tabswitcher@volinsky.net.openkey.key" title="Key">
+		<menulist>
+			<menupopup>
+				<menuitem value="A" label="A"/>
+				<menuitem value="B" label="B"/>
+				<menuitem value="C" label="C"/>
+				<menuitem value="D" label="D"/>
+				<menuitem value="E" label="E"/>
+				<menuitem value="F" label="F"/>
+				<menuitem value="G" label="G"/>
+				<menuitem value="H" label="H"/>
+				<menuitem value="I" label="I"/>
+				<menuitem value="J" label="J"/>
+				<menuitem value="K" label="K"/>
+				<menuitem value="L" label="L"/>
+				<menuitem value="M" label="M"/>
+				<menuitem value="N" label="N"/>
+				<menuitem value="O" label="O"/>
+				<menuitem value="P" label="P"/>
+				<menuitem value="Q" label="Q"/>
+				<menuitem value="R" label="R"/>
+				<menuitem value="S" label="S"/>
+				<menuitem value="T" label="T"/>
+				<menuitem value="U" label="U"/>
+				<menuitem value="V" label="V"/>
+				<menuitem value="W" label="W"/>
+				<menuitem value="X" label="X"/>
+				<menuitem value="Y" label="Y"/>
+				<menuitem value="Z" label="Z"/>
+			</menupopup>
+		</menulist>
+  </setting>
+</vbox>
