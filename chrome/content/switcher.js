@@ -44,8 +44,10 @@ function init() {
 		}
 	});
 
-	collectActions();
-	filterResults();
+	setTimeout(function() {
+		collectActions();
+		filterResults();
+	}, 0);
 }
 
 function collectActions() {
