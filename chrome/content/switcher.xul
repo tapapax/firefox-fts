@@ -7,7 +7,7 @@
     onload="init();"
     xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
-<command id="cmd_goSelected" oncommand="goSelected();"/>
+<command id="cmd_goSelected" oncommand="performAction();"/>
 
 <listbox id="results-listbox" flex="1">
 	<listhead>
@@ -21,7 +21,7 @@
 </listbox>
 
 <hbox>
-	<textbox id="pattern-textbox" flex="1" oninput="performFind();"/>
+	<textbox id="pattern-textbox" flex="1" oninput="filterResults();"/>
 </hbox>
 
 <keyset>

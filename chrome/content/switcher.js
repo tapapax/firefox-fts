@@ -1,27 +1,55 @@
-var elResults;
-var elPattern;
+Components.utils.import("resource://gre/modules/Services.jsm");
 
-var windowMediator = Components.classes["@mozilla.org/appshell/window-mediator;1"]
-	.getService(Components.interfaces.nsIWindowMediator);
+var resultsListbox;
+var patternTextbox;
 
 var actionsList = [];
 
-Components.utils.import("resource://gre/modules/devtools/Console.jsm");
+///////////////////////////////////////////////////////////////
+
+function Action(columnsText, options) {
+	this.columnsText = columnsText;
+	this.options = options;
+	this.searchString = columnsText.join(" ").toLowerCase();
+}
+
+Action.prototype.perform = function() {
+	if (this.options.window && this.options.tab) {
+		this.options.window.gBrowser.selectedTab = this.options.tab;
+		this.options.window.focus();
+	} else if (this.options.url) {
+		var win = Services.wm.getMostRecentWindow("navigator:browser");
+		if (win) {
+			win.delayedOpenTab(this.options.url);
+		}
+	}
+}
+
+Action.prototype.getOrder = function() {
+	return this.options.tab ? this.options.tab._lastAccessed : 0;
+}
+
+///////////////////////////////////////////////////////////////
 
 function init() {
-	elResults = document.getElementById("results-listbox");
-	elPattern = document.getElementById("pattern-textbox");
+	resultsListbox = document.getElementById("results-listbox");
+	patternTextbox = document.getElementById("pattern-textbox");
 
-	elPattern.focus();
-	elPattern.addEventListener("keypress", function(e) {
+	patternTextbox.focus();
+	patternTextbox.addEventListener("keypress", function(e) {
 		if ([33, 34, 38, 40].indexOf(e.keyCode) !== -1) {
 			var event = new KeyboardEvent("keypress", e);
-			elResults.dispatchEvent(event);
+			resultsListbox.dispatchEvent(event);
 			e.preventDefault();
 		}
 	});
 
-	var windows = windowMediator.getEnumerator("navigator:browser");
+	collectActions();
+	filterResults();
+}
+
+function collectActions() {
+	var windows = Services.wm.getEnumerator("navigator:browser");
 	while (windows.hasMoreElements()) {
 		var window = windows.getNext();
 		for (var index = 0; index < window.gBrowser.browsers.length; ++index) {
@@ -29,54 +57,45 @@ function init() {
 			var url = window.gBrowser.getBrowserAtIndex(index).currentURI.spec;
 			var label = tab.getAttribute("label");
 
-			actionsList.push({ window, tab, strings : [ label, url ] });
+			actionsList.push(new Action([ label, url ], { window, tab }));
 		}
 	}
 
 	actionsList.sort(function(a, b) {
-		return b.tab._lastAccessed - a.tab._lastAccessed;
+		return b.getOrder() - a.getOrder();
 	});
 
 	for (var bookmark of collectBookmarks()) {
-		actionsList.push({
-			strings: [ bookmark.label, bookmark.url ],
-			url: bookmark.url
-		});
+		actionsList.push(new Action(
+			[ bookmark.label, bookmark.url ],
+			{ url: bookmark.url }
+		));
 	}
-
-	performFind();
 }
 
-function performFind() {
-	while (elResults.getRowCount()) {
-		elResults.removeItemAt(0);
+function filterResults() {
+	while (resultsListbox.getRowCount()) {
+		resultsListbox.removeItemAt(0);
 	}
 
-	var re = new RegExp(elPattern.value, 'i');
+	var patterns = patternTextbox.value.toLowerCase().split(" ");
+	
 	for (var action of actionsList) {
-		if (action.strings.some(re.test, re)) {
-			var item = addItemToList(elResults, action.strings);
-			item.tabData = action
-			item.setAttribute("ondblclick", "goSelected();");
+		if (patterns.every(pattern => action.searchString.indexOf(pattern) !== -1)) {
+			var item = addItemToList(resultsListbox, action.columnsText);
+			item.actionData = action;
+			item.addEventListener("dblclick", performAction);
 		}
 	}
 
-	elResults.selectedIndex = 0;
+	resultsListbox.selectedIndex = 0;
 }
 
-function goSelected() {
-	var tabData = elResults.selectedItem.tabData;
-	if (tabData.window && tabData.tab) {
-		tabData.window.gBrowser.selectedTab = tabData.tab;
-		tabData.window.focus();
-	} else if (tabData.url) {
-		var win = windowMediator.getMostRecentWindow("navigator:browser");
-		if (win) {
-			win.delayedOpenTab(tabData.url);
-		}
-	}
-
-	window.close();
+function performAction() {
+	try {
+		resultsListbox.selectedItem.actionData.perform();
+		window.close();
+	} catch (e) { }
 }
 
 function addItemToList(list, cells) {
