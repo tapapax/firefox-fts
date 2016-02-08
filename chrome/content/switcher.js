@@ -1,4 +1,5 @@
 Components.utils.import("resource://gre/modules/Services.jsm");
+Components.utils.import("chrome://tabswitcher/content/preferences.jsm");
 
 var resultsListbox;
 var patternTextbox;
@@ -67,11 +68,13 @@ function collectActions() {
 		return b.getOrder() - a.getOrder();
 	});
 
-	for (var bookmark of collectBookmarks()) {
-		actionsList.push(new Action(
-			[ bookmark.label, bookmark.url ],
-			{ url: bookmark.url }
-		));
+	if (Preferences.getExtensionBranch().getBoolPref("bookmarksActions")) {
+		for (var bookmark of collectBookmarks()) {
+			actionsList.push(new Action(
+				[ bookmark.label, bookmark.url ],
+				{ url: bookmark.url }
+			));
+		}
 	}
 }
 

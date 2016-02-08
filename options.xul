@@ -36,4 +36,5 @@
 			</menupopup>
 		</menulist>
   </setting>
+  <setting type="bool" pref="extensions.tabswitcher@volinsky.net.bookmarksActions" title="Bookmarks in list"/>
 </vbox>
