@@ -3,7 +3,6 @@
 
   <Description about="urn:mozilla:install-manifest">
     <em:id>tabswitcher@volinsky.net</em:id>
-    <em:unpack>true</em:unpack>
     <em:name>Fast Tab Switcher</em:name>
     <em:version>1.0.2</em:version>
     <em:type>2</em:type>
