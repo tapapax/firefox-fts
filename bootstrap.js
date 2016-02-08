@@ -1,17 +1,4 @@
-
-Components.utils.import("resource://gre/modules/devtools/Console.jsm");
-
-function Preferences() {
-	this.root = Components.classes["@mozilla.org/preferences;1"]
-		.getService(Components.interfaces.nsIPrefBranch);
-	this.prefix = "extensions.tabswitcher@volinsky.net.";
-	this.getModifiers = function() {
-		return ["control", "alt", "shift"].filter(
-			function(mod) { 
-				return this.root.getBoolPref(this.prefix + "openkey." + mod);
-			}, this).join(" ");
-	}
-}
+Components.utils.import("resource://gre/modules/Services.jsm");
 
 function updateWinInject(window, activate) {
 	var KEY_ID = "key_opentabswitcher";
@@ -32,16 +19,21 @@ function updateWinInject(window, activate) {
 			keyset.removeChild(keyset.firstChild);
 		}
 
-		var prefs = new Preferences;
-
 		key = document.createElement("key");
 		key.id = KEY_ID;
-		key.setAttribute("modifiers", prefs.getModifiers());
-		key.setAttribute("key", prefs.root.getCharPref(prefs.prefix + "openkey.key"));
+
+		var modifiers = ["control", "alt", "shift"].filter(
+				mod => Preferences.getExtensionBranch().getBoolPref("openkey." + mod)
+			).join(" ");
+		key.setAttribute("modifiers", modifiers);
+
+		key.setAttribute("key",
+			Preferences.getUCharPref("openkey.key", Preferences.getExtensionBranch()));
 		key.setAttribute("oncommand",
 			"window.open('chrome://tabswitcher/content/switcher.xul', \
 				'TabswitcherMainWindow', \
 				'chrome,centerscreen,width=1000,height=500,resizable');");
+		
 		keyset.appendChild(key);
 
 		var mainKeyset = document.getElementById("mainKeyset");
@@ -63,13 +55,9 @@ function windowsObserver(window, topic) {
 }
 
 function injectIntoWindows() {
-	var wwClass = Components.classes["@mozilla.org/embedcomp/window-watcher;1"];
-	var ww = wwClass.getService(Components.interfaces.nsIWindowWatcher);
-	ww.registerNotification(windowsObserver);
+	Services.ww.registerNotification(windowsObserver);
 	
-	var wmClass = Components.classes["@mozilla.org/appshell/window-mediator;1"];
-	var wm = wmClass.getService(Components.interfaces.nsIWindowMediator);
-	enumerator = wm.getEnumerator("navigator:browser");
+	var enumerator = Services.wm.getEnumerator("navigator:browser");
 	while (enumerator.hasMoreElements()) {
 		var window = enumerator.getNext();
 		updateWinInject(window, true);
@@ -77,13 +65,9 @@ function injectIntoWindows() {
 }
 
 function clearWindowsInjection() {
-	var wwClass = Components.classes["@mozilla.org/embedcomp/window-watcher;1"];
-	var ww = wwClass.getService(Components.interfaces.nsIWindowWatcher);
-	ww.unregisterNotification(windowsObserver);
+	Services.ww.unregisterNotification(windowsObserver);
 	
-	var wmClass = Components.classes["@mozilla.org/appshell/window-mediator;1"];
-	var wm = wmClass.getService(Components.interfaces.nsIWindowMediator);
-	enumerator = wm.getEnumerator("navigator:browser");
+	var enumerator = Services.wm.getEnumerator("navigator:browser");
 	while (enumerator.hasMoreElements()) {
 		var window = enumerator.getNext();
 		updateWinInject(window, false);
@@ -98,29 +82,23 @@ var openkeyObserver = {
 };
 
 function startup() {
+	Components.utils.import("chrome://tabswitcher/content/preferences.jsm");
+
+	Preferences.loadDefaults();
+
 	injectIntoWindows();
 
-	var prefs = new Preferences;
-	prefs.root.addObserver(prefs.prefix + "openkey.", openkeyObserver, false);
+	Services.prefs.addObserver(
+		Preferences.getExtPrefix() + "openkey.", openkeyObserver, false);
 }
 
 function shutdown() {
-	var prefs = new Preferences;
-	prefs.root.removeObserver(prefs.prefix + "openkey.", openkeyObserver);
+	Services.prefs.removeObserver(
+		Preferences.getExtPrefix() + "openkey.", openkeyObserver);
 
 	clearWindowsInjection();
 }
 
-function install() {
-	var prefs = new Preferences;
-	try {
-		prefs.root.getCharPref(prefs.prefix + "openkey.key");
-	} catch (e) {
-		prefs.root.setCharPref(prefs.prefix + "openkey.key", "D");
-		prefs.root.setBoolPref(prefs.prefix + "openkey.control", false);
-		prefs.root.setBoolPref(prefs.prefix + "openkey.shift", true);
-		prefs.root.setBoolPref(prefs.prefix + "openkey.alt", true);
-	}
-}
+function install() { }
 
 function uninstall() { }
