@@ -1,3 +1,5 @@
+"use strict";
+
 Components.utils.import("resource://gre/modules/Services.jsm");
 Components.utils.import("chrome://tabswitcher/content/preferences.jsm");
 
@@ -44,6 +46,8 @@ function init() {
 			e.preventDefault();
 		}
 	});
+
+	window.addEventListener("deactivate", () => window.close());
 
 	setTimeout(function() {
 		collectActions();
