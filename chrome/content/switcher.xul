@@ -9,6 +9,10 @@
 
 <command id="cmd_goSelected" oncommand="performAction();"/>
 
+<hbox>
+	<textbox id="pattern-textbox" flex="1" oninput="filterResults();"/>
+</hbox>
+
 <listbox id="results-listbox" flex="1">
 	<listhead>
 		<listheader label="Title"/>
@@ -19,10 +23,6 @@
 		<listcol flex="1"/>
 	</listcols>
 </listbox>
-
-<hbox>
-	<textbox id="pattern-textbox" flex="1" oninput="filterResults();"/>
-</hbox>
 
 <keyset>
 	<key keycode="VK_RETURN" command="cmd_goSelected"/>
