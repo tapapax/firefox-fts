@@ -7,6 +7,13 @@
   <setting type="menulist" pref="extensions.tabswitcher@volinsky.net.openkey.key" title="Key">
 		<menulist>
 			<menupopup>
+				<menuitem value=" " label="Space"/>
+				<menuitem value="VK_TAB" label="Tab"/>
+				<menuitem value="VK_RETURN" label="Enter"/>
+				<menuitem value="VK_LEFT" label="Left"/>
+				<menuitem value="VK_RIGHT" label="Right"/>
+				<menuitem value="VK_UP" label="Up"/>
+				<menuitem value="VK_DOWN" label="Down"/>
 				<menuitem value="A" label="A"/>
 				<menuitem value="B" label="B"/>
 				<menuitem value="C" label="C"/>

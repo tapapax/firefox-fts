@@ -19,22 +19,22 @@ function updateWinInject(window, activate) {
 			keyset.removeChild(keyset.firstChild);
 		}
 
-		key = document.createElement("key");
-		key.id = KEY_ID;
+		keyElement = document.createElement("key");
+		keyElement.id = KEY_ID;
 
 		var modifiers = ["control", "alt", "shift"].filter(
 				mod => Preferences.getExtensionBranch().getBoolPref("openkey." + mod)
 			).join(" ");
-		key.setAttribute("modifiers", modifiers);
+		keyElement.setAttribute("modifiers", modifiers);
 
-		key.setAttribute("key",
-			Preferences.getUCharPref("openkey.key", Preferences.getExtensionBranch()));
-		key.setAttribute("oncommand",
+		var key = Preferences.getUCharPref("openkey.key", Preferences.getExtensionBranch());
+		keyElement.setAttribute(key.length > 1 ? "keycode" : "key", key);
+		keyElement.setAttribute("oncommand",
 			"window.open('chrome://tabswitcher/content/switcher.xul', \
 				'TabswitcherMainWindow', \
 				'chrome,centerscreen,width=1000,height=500,resizable');");
-		
-		keyset.appendChild(key);
+
+		keyset.appendChild(keyElement);
 
 		var mainKeyset = document.getElementById("mainKeyset");
 		mainKeyset.parentElement.insertBefore(keyset, mainKeyset);
