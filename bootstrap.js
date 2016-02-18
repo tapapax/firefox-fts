@@ -102,25 +102,10 @@ function shutdown() {
 }
 
 function doUpgrade(extData) {
-	try {
-		var versionComparator =
-			Components.classes["@mozilla.org/xpcom/version-comparator;1"]
-	    .getService(Components.interfaces.nsIVersionComparator);
-
-	  if (extData.oldVersion
-	  	&& versionComparator.compare("1.0.4", extData.oldVersion) > 0)
-	  {
-	  	var extBranch = Preferences.getExtensionBranch();
-	  	for (var name of ["key", "control", "shift", "alt"]) {
-	  		if (extBranch.prefHasUserValue("openkey." + name)) {
-	  			return;
-	  		}
-	  	}
-
-	  	Preferences.setGenericPref(extBranch, "openkey.key", "D");
-	  	Preferences.setGenericPref(extBranch, "openkey.shift", true);
-	  	Preferences.setGenericPref(extBranch, "openkey.alt", true);
-	  	Preferences.setGenericPref(extBranch, "openkey.control", false);
-	  }
-	} catch (e) { }
+	if (extData.oldVersion) {
+		var win = Services.wm.getMostRecentWindow("navigator:browser");
+		if (win) {
+			win.delayedOpenTab("http://tapapax.github.io/firefox-fts/");
+		}
+	}
 }
