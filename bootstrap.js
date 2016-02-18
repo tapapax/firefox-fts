@@ -81,8 +81,10 @@ var openkeyObserver = {
 	}
 };
 
-function startup() {
+function startup(extData) {
 	Components.utils.import("chrome://tabswitcher/content/preferences.jsm");
+
+	doUpgrade(extData);
 
 	Preferences.loadDefaults();
 
@@ -99,6 +101,26 @@ function shutdown() {
 	clearWindowsInjection();
 }
 
-function install() { }
+function doUpgrade(extData) {
+	try {
+		var versionComparator =
+			Components.classes["@mozilla.org/xpcom/version-comparator;1"]
+	    .getService(Components.interfaces.nsIVersionComparator);
 
-function uninstall() { }
+	  if (extData.oldVersion
+	  	&& versionComparator.compare("1.0.4", extData.oldVersion) > 0)
+	  {
+	  	var extBranch = Preferences.getExtensionBranch();
+	  	for (var name of ["key", "control", "shift", "alt"]) {
+	  		if (extBranch.prefHasUserValue("openkey." + name)) {
+	  			return;
+	  		}
+	  	}
+
+	  	Preferences.setGenericPref(extBranch, "openkey.key", "D");
+	  	Preferences.setGenericPref(extBranch, "openkey.shift", true);
+	  	Preferences.setGenericPref(extBranch, "openkey.alt", true);
+	  	Preferences.setGenericPref(extBranch, "openkey.control", false);
+	  }
+	} catch (e) { }
+}
