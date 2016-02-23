@@ -1,5 +1,33 @@
 Components.utils.import("resource://gre/modules/Services.jsm");
 
+function getInitialTabOrder() {
+	var tabOrder = [];
+	Injector.forEachWindow(function(window) {
+		for (var tab of window.gBrowser.tabContainer.childNodes) {
+			tabOrder.push(tab);
+		}
+	});
+	tabOrder.sort((a, b) => a._lastAccessed - b._lastAccessed);
+	return tabOrder;
+}
+
+function updateTabOrder(event) {
+	var tabOrder = TabswitcherData.tabOrder;
+	var index = tabOrder.indexOf(event.target);
+	if (index !== -1) {
+		tabOrder.splice(index, 1);
+	}
+	if (event.type !== "TabClose") {
+		tabOrder.push(event.target);
+	}
+}
+
+function onWinUnload(event) {
+	for (var tab of event.currentTarget.gBrowser.tabContainer.childNodes) {
+		updateTabOrder({ type: "TabClose", target: tab });
+	}
+}
+
 function updateWinInject(window, activate) {
 	var KEY_ID = "key_opentabswitcher";
 	var KEYSET_ID = "keyset_tabswitcher";
@@ -14,7 +42,26 @@ function updateWinInject(window, activate) {
 		keyset.id = KEYSET_ID;
 	}
 
+	var tabEvents = [ "TabSelect", "TabClose", "TabOpen" ];
+	tabEvents.forEach((event) => {
+		window.gBrowser.tabContainer.removeEventListener(event, updateTabOrder);
+	});
+
+	window.removeEventListener("unload", onWinUnload);
+
 	if (activate) {
+		for (var tab of window.gBrowser.tabContainer.childNodes) {
+			if (TabswitcherData.tabOrder.indexOf(tab) === -1) {
+				TabswitcherData.tabOrder.push(tab);
+			}
+		}
+
+		tabEvents.forEach((event) => {
+			window.gBrowser.tabContainer.addEventListener(event, updateTabOrder);
+		});
+
+		window.addEventListener("unload", onWinUnload);
+
 		while (keyset.firstChild) {
 			keyset.removeChild(keyset.firstChild);
 		}
@@ -41,54 +88,23 @@ function updateWinInject(window, activate) {
 	}
 }
 
-function windowsObserver(window, topic) {
-	if (topic !== "domwindowopened") {
-		return;
-	}
-
-	window.addEventListener("load", function() {
-		this.removeEventListener("load", arguments.callee, false);
-		if (window.location.href == 'chrome://browser/content/browser.xul') {
-			updateWinInject(window, true);
-		}
-	}, false);
-}
-
-function injectIntoWindows() {
-	Services.ww.registerNotification(windowsObserver);
-	
-	var enumerator = Services.wm.getEnumerator("navigator:browser");
-	while (enumerator.hasMoreElements()) {
-		var window = enumerator.getNext();
-		updateWinInject(window, true);
-	}
-}
-
-function clearWindowsInjection() {
-	Services.ww.unregisterNotification(windowsObserver);
-	
-	var enumerator = Services.wm.getEnumerator("navigator:browser");
-	while (enumerator.hasMoreElements()) {
-		var window = enumerator.getNext();
-		updateWinInject(window, false);
-	}
-}
-
 var openkeyObserver = {
 	observe: function() {
-		clearWindowsInjection();
-		injectIntoWindows();
+		Injector.reload();
 	}
 };
 
 function startup(extData) {
 	Components.utils.import("chrome://tabswitcher/content/preferences.jsm");
+	Components.utils.import("chrome://tabswitcher/content/libs/injector.jsm");
+	Components.utils.import("chrome://tabswitcher/content/tabswitcher_data.jsm");
 
 	doUpgrade(extData);
 
 	Preferences.loadDefaults();
 
-	injectIntoWindows();
+	TabswitcherData.tabOrder = getInitialTabOrder();
+	Injector.inject(updateWinInject);
 
 	Services.prefs.addObserver(
 		Preferences.getExtPrefix() + "openkey.", openkeyObserver, false);
@@ -98,7 +114,7 @@ function shutdown() {
 	Services.prefs.removeObserver(
 		Preferences.getExtPrefix() + "openkey.", openkeyObserver);
 
-	clearWindowsInjection();
+	Injector.cleanup();
 }
 
 function doUpgrade(extData) {

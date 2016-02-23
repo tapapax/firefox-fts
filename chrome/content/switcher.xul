@@ -10,7 +10,12 @@
 <command id="cmd_goSelected" oncommand="performAction();"/>
 
 <hbox>
-	<textbox id="pattern-textbox" flex="1" oninput="filterResults();"/>
+	<stack flex="1">
+		<textbox id="pattern-textbox" flex="1" oninput="filterResults();" style="font-size: large;"/>
+		<hbox pack="end" align="center" right="10">
+			<image id="progress-image" src="chrome://tabswitcher/skin/clock.png"/>
+		</hbox>
+	</stack>
 </hbox>
 
 <listbox id="results-listbox" flex="1">
