@@ -21,7 +21,14 @@ function init() {
 	patternTextbox.focus();
 	patternTextbox.addEventListener("keypress", function(e) {
 		if ([33, 34, 38, 40].indexOf(e.keyCode) !== -1) {
-			var event = new KeyboardEvent("keypress", e);
+			var event;
+			try {
+				event = new KeyboardEvent("keypress", e);
+			} catch (ex) {
+				event = document.createEvent("KeyboardEvent");
+				event.initKeyEvent("keypress", true, true, null, false, false, false,
+					false, e.keyCode, 0);
+			}
 			resultsListbox.dispatchEvent(event);
 			e.preventDefault();
 		}

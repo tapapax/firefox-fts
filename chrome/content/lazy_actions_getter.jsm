@@ -90,7 +90,7 @@ LazyActionsGetter.prototype.AcquireTabs = function(actions, count) {
 		var urlString = uri ? uri.spec : "";
 		var label = tab.getAttribute("label");
 
-		actions.push(new Action([ label, urlString ], { window, tab }));
+		actions.push(new Action([ label, urlString ], { window: window, tab: tab }));
 	}
 };
 
@@ -100,7 +100,7 @@ LazyActionsGetter.prototype.AcquireBookmarks = function(actions, count) {
 		
 		var bs = Components.classes["@mozilla.org/browser/nav-bookmarks-service;1"]
   		.getService(Components.interfaces.nsINavBookmarksService)
-		this.state = { bs,
+		this.state = { bs: bs,
 			folderStack: [ { folder: bs.bookmarksMenuFolder, nextIndex: 0 } ] };
 	}
 
@@ -125,7 +125,7 @@ LazyActionsGetter.prototype.AcquireBookmarks = function(actions, count) {
 			} else if (item_type === bs.TYPE_BOOKMARK) {
 				var url = bs.getBookmarkURI(id).spec;
 				var label = bs.getItemTitle(id);
-				actions.push(new Action([ label, url ], { url }));
+				actions.push(new Action([ label, url ], { url: url }));
 				count--;
 			}
 		}
