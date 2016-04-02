@@ -59,7 +59,6 @@ Switcher.filterResults = function() {
 
 	this.actionsFilter.startSearch(this.patternTextbox.value);
 	this.doFilterSome();
-	this.resultsListbox.selectedIndex = 0;
 };
 
 Switcher.doFilterSome = function() {
@@ -79,6 +78,10 @@ Switcher.doFilterSome = function() {
 		this.filteringTimeout = setTimeout(this.doFilterSome.bind(this), 0);
 	} else if (moreActions) {
 		addItemToList(this.resultsListbox, ["..."]);
+	}
+
+	if (this.resultsListbox.selectedIndex === -1) {
+		this.resultsListbox.selectedIndex = 0;
 	}
 };
 
