@@ -4,14 +4,14 @@
 <window
     id="tabswitcher-window"
     title="Fast Tab Switcher"
-    onload="init();"
+    onload="Switcher.init()"
     xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
-<command id="cmd_goSelected" oncommand="performAction();"/>
+<command id="perform-command" oncommand="//"/>
 
 <hbox>
 	<stack flex="1">
-		<textbox id="pattern-textbox" flex="1" oninput="filterResults();" style="font-size: large;"/>
+		<textbox id="pattern-textbox" flex="1" style="font-size: large;"/>
 		<hbox pack="end" align="center" right="10">
 			<image id="progress-image" src="chrome://tabswitcher/skin/clock.png"/>
 		</hbox>
@@ -30,7 +30,7 @@
 </listbox>
 
 <keyset>
-	<key keycode="VK_RETURN" command="cmd_goSelected"/>
+	<key keycode="VK_RETURN" command="perform-command"/>
 	<key keycode="VK_ESCAPE" oncommand="window.close();"/>
 </keyset>
 
