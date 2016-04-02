@@ -14,27 +14,27 @@ ActionsFilterWorker.prototype.startSearch = function(query) {
 	this.searchedActions = 0;
 };
 
-ActionsFilterWorker.prototype.work = function(actionsToProceed, found) {
+ActionsFilterWorker.prototype.work = function(actionsToSearch, found) {
+	var totalToSearch = this.searchedActions + actionsToSearch;
+
 	if (!this.acquiredAll) {
+		var actionsToAcquire = totalToSearch - this.actions.length + 1;
 		this.acquiredAll =
-			(this.lazyActionsGetter.Acquire(this.actions, actionsToProceed) === 0);
+			(this.lazyActionsGetter.Acquire(this.actions, actionsToAcquire) === 0);
 	}
 
-	var toBeSearched = Math.min(
-		this.searchedActions + actionsToProceed, this.actions.length);
+	totalToSearch = Math.min(totalToSearch, this.actions.length);
 	
-	if (toBeSearched <= this.searchedActions) {
-		return false;
-	}
-
-	for (; this.searchedActions < toBeSearched; ++this.searchedActions) {
-		var action = this.actions[this.searchedActions];
+	for (var i = this.searchedActions; i < totalToSearch; ++i) {
+		var action = this.actions[i];
 		if (this.isSatisfying(action)) {
 			found.push(action);
 		}
 	}
 
-	return true;
+	this.searchedActions = totalToSearch;
+
+	return this.searchedActions < this.actions.length;
 };
 
 ActionsFilterWorker.prototype.isSatisfying = function(action) {
