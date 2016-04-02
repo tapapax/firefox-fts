@@ -36,6 +36,7 @@ Action.prototype.perform = function() {
 			win.delayedOpenTab(this.options.url);
 		}
 	}
+	return true;
 }
 
 ///////////////////////////////////////////////////////////////
