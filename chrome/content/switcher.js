@@ -89,6 +89,7 @@ Switcher.performAction = function() {
 	var selectedItem = this.resultsListbox.selectedItem;
 	var ad = selectedItem ? selectedItem.actionData : null;
 	if (ad) {
+		this.stopFiltering();
 		ad.perform();
 		window.close();
 	}
