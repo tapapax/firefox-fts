@@ -124,10 +124,13 @@ LazyActionsGetter.prototype.AcquireBookmarks = function(actions, count) {
 			if (item_type === bs.TYPE_FOLDER) {
 				this.state.folderStack.push( { folder: id, nextIndex: 0 } );
 			} else if (item_type === bs.TYPE_BOOKMARK) {
-				var url = bs.getBookmarkURI(id).spec;
-				var label = bs.getItemTitle(id);
-				actions.push(new Action([ label, url ], { url: url }));
-				count--;
+				var uri = bs.getBookmarkURI(id);
+				if (uri.scheme !== "place") {
+					var label = bs.getItemTitle(id);
+					var urlString = uri.spec;
+					actions.push(new Action([ label, urlString ], { url: urlString }));
+					count--;
+				}
 			}
 		}
 	}
