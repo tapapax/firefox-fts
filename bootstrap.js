@@ -1,5 +1,7 @@
 Components.utils.import("resource://gre/modules/Services.jsm");
 
+var MAX_VERSION_TO_SHOW_CHANGES = "1.0.6";
+
 var ADDON_MODULES = [
 	"chrome://tabswitcher/content/actions_filter_worker.jsm"
 	,"chrome://tabswitcher/content/lazy_actions_getter.jsm"
@@ -140,10 +142,16 @@ function unloadAddonModules() {
 }
 
 function doUpgrade(extData) {
-	if (extData.oldVersion) {
-		var win = Services.wm.getMostRecentWindow("navigator:browser");
-		if (win) {
-			win.delayedOpenTab("http://tapapax.github.io/firefox-fts/");
-		}
+	if (!extData.oldVersion) {
+		return;
+	}
+
+	if (Services.vc.compare(extData.oldVersion, MAX_VERSION_TO_SHOW_CHANGES) > 0) {
+		return;
+	}
+
+	var win = Services.wm.getMostRecentWindow("navigator:browser");
+	if (win) {
+		win.delayedOpenTab("http://tapapax.github.io/firefox-fts/");
 	}
 }
