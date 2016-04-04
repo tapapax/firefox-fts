@@ -1,5 +1,13 @@
 Components.utils.import("resource://gre/modules/Services.jsm");
 
+var ADDON_MODULES = [
+	"chrome://tabswitcher/content/actions_filter_worker.jsm"
+	,"chrome://tabswitcher/content/lazy_actions_getter.jsm"
+	,"chrome://tabswitcher/content/preferences.jsm"
+	,"chrome://tabswitcher/content/tabswitcher_data.jsm"
+	,"chrome://tabswitcher/content/libs/injector.jsm"
+];
+
 function getInitialTabOrder() {
 	var tabOrder = [];
 	Injector.forEachWindow(function(window) {
@@ -95,6 +103,10 @@ var openkeyObserver = {
 };
 
 function startup(extData) {
+	// TODO: remove - temporary unloading modules on install to fix update
+	// from previous versions
+	unloadAddonModules();
+
 	Components.utils.import("chrome://tabswitcher/content/preferences.jsm");
 	Components.utils.import("chrome://tabswitcher/content/libs/injector.jsm");
 	Components.utils.import("chrome://tabswitcher/content/tabswitcher_data.jsm");
@@ -115,6 +127,16 @@ function shutdown() {
 		Preferences.getExtPrefix() + "openkey.", openkeyObserver);
 
 	Injector.cleanup();
+
+	unloadAddonModules();
+}
+
+function unloadAddonModules() {
+	for (var module of ADDON_MODULES) {
+		try {
+			Components.utils.unload(module);
+		} catch (e) {}
+	}
 }
 
 function doUpgrade(extData) {
