@@ -19,8 +19,10 @@ ActionsFilterWorker.prototype.work = function(actionsToSearch, found) {
 
 	if (!this.acquiredAll) {
 		var actionsToAcquire = totalToSearch - this.actions.length + 1;
-		this.acquiredAll =
-			(this.lazyActionsGetter.Acquire(this.actions, actionsToAcquire) === 0);
+		if (actionsToAcquire > 0) {
+			this.acquiredAll =
+				(this.lazyActionsGetter.Acquire(this.actions, actionsToAcquire) === 0);
+		}
 	}
 
 	totalToSearch = Math.min(totalToSearch, this.actions.length);
