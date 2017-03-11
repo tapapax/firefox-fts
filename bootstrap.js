@@ -1,6 +1,6 @@
 Components.utils.import("resource://gre/modules/Services.jsm");
 
-var MAX_VERSION_TO_SHOW_CHANGES = "1.0.6";
+var MAX_VERSION_TO_SHOW_CHANGES = "1.0.8";
 
 var ADDON_MODULES = [
 	"chrome://tabswitcher/content/actions_filter_worker.jsm"
