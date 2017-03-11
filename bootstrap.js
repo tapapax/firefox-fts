@@ -52,6 +52,10 @@ function onKeyDownFix(event) {
 	event.view.open('chrome://tabswitcher/content/switcher.xul', 
 		'TabswitcherMainWindow', 
 		'chrome,centerscreen,width=1000,height=500,resizable');
+
+	if (event.preventDefault) {
+		event.preventDefault();
+	}
 }
 
 function updateWinInject(window, activate) {
