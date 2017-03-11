@@ -38,6 +38,22 @@ function onWinUnload(event) {
 	}
 }
 
+function onKeyDownFix(event) {
+	// REFACTORME: temporary quick workaround for 52 ff version
+
+	if (event.keyCode != 32 || event.metaKey || event.shiftKey || !event.ctrlKey) {
+		return;
+	}
+
+	if (!event.view || !event.view.open) {
+		return;
+	}
+
+	event.view.open('chrome://tabswitcher/content/switcher.xul', 
+		'TabswitcherMainWindow', 
+		'chrome,centerscreen,width=1000,height=500,resizable');
+}
+
 function updateWinInject(window, activate) {
 	var KEY_ID = "key_opentabswitcher";
 	var KEYSET_ID = "keyset_tabswitcher";
@@ -58,6 +74,7 @@ function updateWinInject(window, activate) {
 	});
 
 	window.removeEventListener("unload", onWinUnload);
+	window.removeEventListener("keydown", onKeyDownFix);
 
 	if (activate) {
 		for (var tab of window.gBrowser.tabContainer.childNodes) {
@@ -86,12 +103,17 @@ function updateWinInject(window, activate) {
 
 		var key = Preferences.getUCharPref("openkey.key", Preferences.getExtensionBranch());
 		keyElement.setAttribute(key.length > 1 ? "keycode" : "key", key);
+		keyElement.setAttribute("reserved", "true");
 		keyElement.setAttribute("oncommand",
 			"window.open('chrome://tabswitcher/content/switcher.xul', \
 				'TabswitcherMainWindow', \
 				'chrome,centerscreen,width=1000,height=500,resizable');");
 
-		keyset.appendChild(keyElement);
+		if (key == " " && modifiers == "control") {
+			window.addEventListener("keydown", onKeyDownFix);
+		} else {
+			keyset.appendChild(keyElement);
+		}
 
 		var mainKeyset = document.getElementById("mainKeyset");
 		mainKeyset.parentElement.insertBefore(keyset, mainKeyset);
