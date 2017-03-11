@@ -45,11 +45,7 @@ function onKeyDownFix(event) {
 		return;
 	}
 
-	if (!event.view || !event.view.open) {
-		return;
-	}
-
-	event.view.open('chrome://tabswitcher/content/switcher.xul', 
+	this.open('chrome://tabswitcher/content/switcher.xul', 
 		'TabswitcherMainWindow', 
 		'chrome,centerscreen,width=1000,height=500,resizable');
 
@@ -63,7 +59,7 @@ function updateWinInject(window, activate) {
 	var KEYSET_ID = "keyset_tabswitcher";
 
 	var document = window.document;
-	
+
 	var keyset = document.getElementById(KEYSET_ID);
 	if (keyset) {
 		keyset.parentElement.removeChild(keyset);
