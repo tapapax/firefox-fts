@@ -2,10 +2,10 @@
 
 ## Version history
 
-Current Fast Tab Switcher version: **1.0.10**
+Current Fast Tab Switcher version: **1.0.11**
 If you experience any troubles with FTS, please email me to *tapapax_at_g_mail_dot_com* or create an issue on github.
 
-### 1.0.10
+### 1.0.11
 - Fix issue with not working Ctrl+Space combination in FF52
 
 ### 1.0.8
