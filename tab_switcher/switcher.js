@@ -1,8 +1,14 @@
 
 let selectedString;
+let allTabsSorted;
 
 async function reloadTabs(query) {
-	let tabs = await browser.tabs.query({windowType: 'normal'});
+	if (allTabsSorted === undefined) {
+		const allTabs = await browser.tabs.query({windowType: 'normal'});
+		allTabsSorted = allTabs.sort((a, b) => b.lastAccessed - a.lastAccessed);
+	}
+
+	let tabs = allTabsSorted;
 	if (query) {
 		tabs = tabs.filter(tabsFilter(query));
 	}
@@ -22,6 +28,7 @@ async function reloadTabs(query) {
 			.data('index', tabIndex)
 			.data('tabId', tab.id)
 			.on('click', () => setSelectedString(tabIndex))
+			.on('dblclick', e => activateTab())
 		)
 	);
 
@@ -31,8 +38,8 @@ async function reloadTabs(query) {
 function tabsFilter(query) {
 	const patterns = query.toLowerCase().split(" ");
 	return tab => patterns.every(
-		pattern => tab.url.indexOf(pattern) !== -1
-			|| tab.title.indexOf(pattern) !== -1);
+		pattern => tab.url.toLowerCase().indexOf(pattern) !== -1
+			|| tab.title.toLowerCase().indexOf(pattern) !== -1);
 }
 
 reloadTabs();
@@ -50,6 +57,14 @@ $(window).on('keydown', event => {
 	} else if (key === 'ArrowUp') {
 		setSelectedString(getSelectedString() - 1);
 		event.preventDefault();
+	} else if (key === 'PageDown') {
+		setSelectedString(Math.min(getSelectedString() + 13, getTableSize() - 1));
+		event.preventDefault();
+	} else if (key === 'PageUp') {
+		setSelectedString(Math.max(getSelectedString() - 13, 0));
+		event.preventDefault();
+	} else if (key === 'Escape') {
+		browser.windows.remove(browser.windows.WINDOW_ID_CURRENT);
 	} else if (key === 'Enter') {
 		activateTab();
 	}
@@ -64,14 +79,15 @@ function setSelectedString(index) {
 		return;
 	}
 
-	newSelected.addClass('tabs_table__selected');
 	if (selectedString) {
 		selectedString.removeClass('tabs_table__selected');
 	}
 
+	newSelected.addClass('tabs_table__selected');
+
 	selectedString = newSelected;
 
-	const tableContainer = table.parent();
+	const tableContainer = $('#tabs_table__container');
 	const stringOffset = selectedString[0].offsetTop;
 	const scrollMax = stringOffset - 20;
 	const scrollMin = stringOffset + selectedString.height() - tableContainer.height() + 20;
@@ -79,6 +95,10 @@ function setSelectedString(index) {
 	const scrollValue = Math.max(scrollMin,
 		Math.min(scrollMax, tableContainer.scrollTop()));
 	tableContainer.scrollTop(scrollValue);
+}
+
+function getTableSize() {
+	return $('#tabs_table tbody tr').length;
 }
 
 function getSelectedString() {

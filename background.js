@@ -34,7 +34,7 @@ async function openFtsWindow() {
 
 function onFocusChanged(windowId) {
 	if (ftsWindowId && windowId !== ftsWindowId) {
-		//browser.windows.remove(ftsWindowId);
+		browser.windows.remove(ftsWindowId);
 	}
 }
 

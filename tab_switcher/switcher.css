@@ -28,6 +28,7 @@ body {
 	table-layout: fixed;
 	border: 0;
 	font-size: 14px;
+	margin-left: 1px;
 }
 
 #tabs_table td {
@@ -35,6 +36,8 @@ body {
 	text-overflow: ellipsis;
 	padding-top: 4px;
 	padding-bottom: 4px;
+	cursor: default;
+	-moz-user-select: none;
 }
 
 .tabs_table__column_icon {
