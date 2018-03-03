@@ -1,0 +1,38 @@
+{
+	"applications" : {
+		"gecko" : {
+			"id" : "tabswitcher1@volinsky.net"
+		}
+	},
+
+	"background" : {
+		"scripts" : ["background.js"]
+	},
+
+	"browser_action" : {
+		"default_icon" : "icons/icon64.png",
+		"default_title" : "Open \"Fast Tab Switcher\" window"
+	},
+
+	"commands" : {
+		"open-fts" : {
+			"suggested_key" : {
+				"default" : "Ctrl+Space"
+			},
+			"description" : "Open \"Fast Tab Switcher\" window"
+		}
+	},
+
+	"icons" : {
+		"32" : "icons/icon.png",
+		"64" : "icons/icon64.png"
+	},
+
+	"manifest_version" : 2,
+
+	"name" : "Fast Tab Switcher",
+
+	"permissions" : ["tabs", "<all_urls>"],
+
+	"version" : "2.0.0"
+}
