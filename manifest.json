@@ -17,7 +17,8 @@
 	"commands" : {
 		"open-fts" : {
 			"suggested_key" : {
-				"default" : "Ctrl+Space"
+				"default" : "Ctrl+Space",
+				"mac" : "MacCtrl+Space"
 			},
 			"description" : "Open \"Fast Tab Switcher\" window"
 		}
