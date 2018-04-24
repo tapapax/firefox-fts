@@ -19,7 +19,11 @@ async function reloadTabs(query) {
 				$('<td></td>').append(
 					tab.favIconUrl
 						? $('<img width="16" height="16">')
-							.attr('src', tab.favIconUrl)
+							.attr('src',
+								!tab.incognito
+									? tab.favIconUrl
+									: '/icons/mask16.svg'
+							)
 						: null
 				),
 				$('<td></td>').text(tab.title),
