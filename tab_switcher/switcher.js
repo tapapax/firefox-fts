@@ -121,3 +121,18 @@ async function activateTab() {
 	const tab = await browser.tabs.get(tabId);
 	await browser.windows.update(tab.windowId, {focused: true});
 }
+
+async function firefox57WorkaroundForBlankPanel() {
+	// https://bugzilla.mozilla.org/show_bug.cgi?id=1425829
+	// browser. windows. create () displays blank windows (panel, popup or detached_panel)
+	// The trick to display content is to resize the window...
+
+	const currentWindow = await browser.windows.getCurrent();
+	const updateInfo = {
+		width: currentWindow.width,
+		height: currentWindow.height + 1, // 1 pixel more than original size...
+	};
+	browser.windows.update(currentWindow.id, updateInfo);
+}
+
+firefox57WorkaroundForBlankPanel();
