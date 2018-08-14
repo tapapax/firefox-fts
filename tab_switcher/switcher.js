@@ -42,8 +42,8 @@ async function reloadTabs(query) {
 function tabsFilter(query) {
 	const patterns = query.toLowerCase().split(" ");
 	return tab => patterns.every(
-		pattern => tab.url.toLowerCase().indexOf(pattern) !== -1
-			|| tab.title.toLowerCase().indexOf(pattern) !== -1);
+		pattern => (tab.url || '').toLowerCase().indexOf(pattern) !== -1
+			|| (tab.title || '').toLowerCase().indexOf(pattern) !== -1);
 }
 
 reloadTabs();
