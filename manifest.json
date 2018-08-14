@@ -14,6 +14,10 @@
 		"default_title" : "Open \"Fast Tab Switcher\" window"
 	},
 
+	"options_ui": {
+		"page": "options/options.html"
+	},
+
 	"commands" : {
 		"open-fts" : {
 			"suggested_key" : {
