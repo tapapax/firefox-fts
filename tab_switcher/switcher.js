@@ -131,15 +131,23 @@ async function activateTab() {
 		return;
 	}
 
-	// Switch to the target tab
 	const tabId = selectedString.data('tabId');
+	const tab = await browser.tabs.get(tabId);
 
+	// Switch to the target tab
 	await browser.tabs.update(tabId, {active: true});
 
-	// Focus on the browser window containing the tab
-	const tab = await browser.tabs.get(tabId);
-	await browser.windows.update(tab.windowId, {focused: true});
+	// Check if we should focus other browser window
+	const currentWin = await browser.windows.getCurrent();
+	if (currentWin.id !== tab.windowId) {
+		// Focus on the browser window containing the tab
+		await browser.windows.update(tab.windowId, {focused: true});
 
-	// Close the tab switcher pop up
-	window.close();
+		// Popup will close itself on window switch.
+		// And if we call window.close() here
+		// origin browser window will become foreground again.
+	} else {
+		// Close the tab switcher pop up
+		window.close();
+	}
 }
