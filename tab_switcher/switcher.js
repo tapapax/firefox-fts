@@ -91,12 +91,29 @@ function setSelectedString(index) {
 
 	selectedString = newSelected;
 
+	scrollToSelection();
+}
+
+function scrollToSelection() {
+	if (!selectedString) {
+		return;
+	}
+
+	const scrollPadding = 20;
+
 	const tableContainer = $('#tabs_table__container');
 	const stringOffset = selectedString[0].offsetTop;
-	const scrollMax = stringOffset - 20;
-	const scrollMin = stringOffset + selectedString.height() - tableContainer.height() + 20;
+	const scrollMax = stringOffset - scrollPadding;
+	const scrollMin = stringOffset
+		+ selectedString.height() - tableContainer.height() + scrollPadding;
 
-	const scrollValue = Math.max(scrollMin,
+	if (scrollMax < scrollMin) {
+		// Resetting scroll since there is no enough space
+		tableContainer.scrollTop(0);
+		return;
+	}
+
+	const scrollValue = Math.max(0, scrollMin,
 		Math.min(scrollMax, tableContainer.scrollTop()));
 	tableContainer.scrollTop(scrollValue);
 }
