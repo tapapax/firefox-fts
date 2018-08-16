@@ -68,7 +68,7 @@ $(window).on('keydown', event => {
 		setSelectedString(Math.max(getSelectedString() - 13, 0));
 		event.preventDefault();
 	} else if (key === 'Escape') {
-		window.close();
+		browser.windows.remove(browser.windows.WINDOW_ID_CURRENT);
 	} else if (key === 'Enter') {
 		activateTab();
 	}
@@ -131,15 +131,25 @@ async function activateTab() {
 		return;
 	}
 
-	// Switch to the target tab
 	const tabId = selectedString.data('tabId');
 
 	await browser.tabs.update(tabId, {active: true});
 
-	// Focus on the browser window containing the tab
 	const tab = await browser.tabs.get(tabId);
 	await browser.windows.update(tab.windowId, {focused: true});
-
-	// Close the tab switcher pop up
-	window.close();
 }
+
+async function firefox57WorkaroundForBlankPanel() {
+	// https://bugzilla.mozilla.org/show_bug.cgi?id=1425829
+	// browser. windows. create () displays blank windows (panel, popup or detached_panel)
+	// The trick to display content is to resize the window...
+
+	const currentWindow = await browser.windows.getCurrent();
+	const updateInfo = {
+		width: currentWindow.width,
+		height: currentWindow.height + 1, // 1 pixel more than original size...
+	};
+	browser.windows.update(currentWindow.id, updateInfo);
+}
+
+firefox57WorkaroundForBlankPanel();
