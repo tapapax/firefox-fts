@@ -2,8 +2,18 @@
 
 ## Version history
 
-Current Fast Tab Switcher version: **2.0.0**
+Current Fast Tab Switcher version: **2.3.0**
 If you experience any troubles with FTS, please email me to *tapapax_at_g_mail_dot_com* or create an issue on github.
+
+### 2.3.0
+- Fast Tab Switcher become a popup (thanks to dmitry-timofeev)
+
+### 2.2.0
+- Implemented hotkey options
+- A few fixes
+
+### 2.1.0
+- A few fixes
 
 ### 2.0.0
 - Firefox Quantum support!
