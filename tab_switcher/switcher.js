@@ -68,7 +68,7 @@ $(window).on('keydown', event => {
 		setSelectedString(Math.max(getSelectedString() - 13, 0));
 		event.preventDefault();
 	} else if (key === 'Escape') {
-		browser.windows.remove(browser.windows.WINDOW_ID_CURRENT);
+		window.close();
 	} else if (key === 'Enter') {
 		activateTab();
 	}
@@ -91,12 +91,29 @@ function setSelectedString(index) {
 
 	selectedString = newSelected;
 
+	scrollToSelection();
+}
+
+function scrollToSelection() {
+	if (!selectedString) {
+		return;
+	}
+
+	const scrollPadding = 20;
+
 	const tableContainer = $('#tabs_table__container');
 	const stringOffset = selectedString[0].offsetTop;
-	const scrollMax = stringOffset - 20;
-	const scrollMin = stringOffset + selectedString.height() - tableContainer.height() + 20;
+	const scrollMax = stringOffset - scrollPadding;
+	const scrollMin = stringOffset
+		+ selectedString.height() - tableContainer.height() + scrollPadding;
 
-	const scrollValue = Math.max(scrollMin,
+	if (scrollMax < scrollMin) {
+		// Resetting scroll since there is no enough space
+		tableContainer.scrollTop(0);
+		return;
+	}
+
+	const scrollValue = Math.max(0, scrollMin,
 		Math.min(scrollMax, tableContainer.scrollTop()));
 	tableContainer.scrollTop(scrollValue);
 }
@@ -114,25 +131,15 @@ async function activateTab() {
 		return;
 	}
 
+	// Switch to the target tab
 	const tabId = selectedString.data('tabId');
 
 	await browser.tabs.update(tabId, {active: true});
 
+	// Focus on the browser window containing the tab
 	const tab = await browser.tabs.get(tabId);
 	await browser.windows.update(tab.windowId, {focused: true});
+
+	// Close the tab switcher pop up
+	window.close();
 }
-
-async function firefox57WorkaroundForBlankPanel() {
-	// https://bugzilla.mozilla.org/show_bug.cgi?id=1425829
-	// browser. windows. create () displays blank windows (panel, popup or detached_panel)
-	// The trick to display content is to resize the window...
-
-	const currentWindow = await browser.windows.getCurrent();
-	const updateInfo = {
-		width: currentWindow.width,
-		height: currentWindow.height + 1, // 1 pixel more than original size...
-	};
-	browser.windows.update(currentWindow.id, updateInfo);
-}
-
-firefox57WorkaroundForBlankPanel();

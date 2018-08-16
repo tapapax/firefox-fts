@@ -5,13 +5,10 @@
 		}
 	},
 
-	"background" : {
-		"scripts" : ["background.js"]
-	},
-
 	"browser_action" : {
 		"default_icon" : "icons/icon64.png",
-		"default_title" : "Open \"Fast Tab Switcher\" window"
+		"default_title" : "Open \"Fast Tab Switcher\" popup",
+		"default_popup" : "tab_switcher/switcher.html"
 	},
 
 	"options_ui": {
@@ -19,12 +16,12 @@
 	},
 
 	"commands" : {
-		"open-fts" : {
+		"_execute_browser_action" : {
 			"suggested_key" : {
 				"default" : "Ctrl+Space",
 				"mac" : "MacCtrl+Space"
 			},
-			"description" : "Open \"Fast Tab Switcher\" window"
+			"description" : "Open \"Fast Tab Switcher\" popup"
 		}
 	},
 
