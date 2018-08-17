@@ -56,16 +56,16 @@ $(window).on('keydown', event => {
 	const key = event.originalEvent.key;
 
 	if (key === 'ArrowDown') {
-		setSelectedString(getSelectedString() + 1);
+		setSelectedString(getNextPageDownIndex(1));
 		event.preventDefault();
 	} else if (key === 'ArrowUp') {
-		setSelectedString(getSelectedString() - 1);
+		setSelectedString(getNextPageUpIndex(1));
 		event.preventDefault();
 	} else if (key === 'PageDown') {
-		setSelectedString(Math.min(getSelectedString() + 13, getTableSize() - 1));
+		setSelectedString(getNextPageDownIndex(13));
 		event.preventDefault();
 	} else if (key === 'PageUp') {
-		setSelectedString(Math.max(getSelectedString() - 13, 0));
+		setSelectedString(getNextPageUpIndex(13));
 		event.preventDefault();
 	} else if (key === 'Escape') {
 		window.close();
@@ -118,11 +118,38 @@ function scrollToSelection() {
 	tableContainer.scrollTop(scrollValue);
 }
 
+/** 
+ * Returns an index of the next tab in the list, if we go pageSize _up_ the list. 
+ * If we are already at the top, then the next index is the index of the last (bottom) tab.
+ */
+function getNextPageUpIndex(pageSize) {
+	const currentSelectedIndex = getSelectedTabIndex();
+	if (currentSelectedIndex === 0) {
+		return getTableSize() - 1;
+	} else {
+		return Math.max(currentSelectedIndex - pageSize, 0);
+	}
+}
+
+/** 
+ * Returns an index of the next tab in the list, if we go pageSize _down_ the list. 
+ * If we are already at the bottom, then the next index is the index of the first (top) tab.
+ */
+function getNextPageDownIndex(pageSize) {
+	const currentSelectedIndex = getSelectedTabIndex();
+	const lastElementIndex = getTableSize() - 1;
+	if (currentSelectedIndex === lastElementIndex) {
+		return 0;
+	} else {
+	    return Math.min(currentSelectedIndex + pageSize, lastElementIndex)
+	}
+}
+
 function getTableSize() {
 	return $('#tabs_table tbody tr').length;
 }
 
-function getSelectedString() {
+function getSelectedTabIndex() {
 	return selectedString ? selectedString.data('index') : undefined;
 }
 
