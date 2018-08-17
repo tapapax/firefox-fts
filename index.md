@@ -1,6 +1,6 @@
 ![logo](https://addons.cdn.mozilla.net/user-media/addon_icons/684/684616-64.png?modified=1455780225)
 
-!!! See this [issue](https://github.com/tapapax/firefox-fts/issues/22) if Fast Tab Switcher popup is showing.
+!!! See this [issue](https://github.com/tapapax/firefox-fts/issues/22) if Fast Tab Switcher popup is not showing.
 
 ## Version history
 
