@@ -1,9 +1,18 @@
 ![logo](https://addons.cdn.mozilla.net/user-media/addon_icons/684/684616-64.png?modified=1455780225)
 
+!!! See this [issue](https://github.com/tapapax/firefox-fts/issues/22) if Fast Tab Switcher popup is showing.
+
 ## Version history
 
-Current Fast Tab Switcher version: **2.3.0**
-If you experience any troubles with FTS, please email me to *tapapax_at_g_mail_dot_com* or create an issue on github.
+Current Fast Tab Switcher version: **2.4.0**
+If you experience any troubles with FTS, please create an [issue](https://github.com/tapapax/firefox-fts/issues/).
+
+### 2.4.0
+- Add sans-serif as the generic font family
+- Add round-robin navigation over the tab list
+- Default button location is now at the url bar
+
+Thanks to dmitry-timofeev for this version.
 
 ### 2.3.0
 - Fast Tab Switcher become a popup (thanks to dmitry-timofeev)
