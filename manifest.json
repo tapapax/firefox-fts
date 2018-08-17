@@ -8,6 +8,7 @@
 	"browser_action" : {
 		"default_icon" : "icons/icon64.png",
 		"default_title" : "Open \"Fast Tab Switcher\" popup",
+		"default_area" : "tabstrip",
 		"default_popup" : "tab_switcher/switcher.html"
 	},
 
