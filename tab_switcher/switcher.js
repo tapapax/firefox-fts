@@ -6,23 +6,37 @@ let allTabsSorted;
  * Always reloads the browser tabs and stores them to `allTabsSorted`
  * in most-recently-used order.
  */
-async function reloadTabs() {
+async function reloadTabs(query) {
 	const allTabs = await browser.tabs.query({windowType: 'normal'});
 	allTabsSorted = allTabs.sort((a, b) => b.lastAccessed - a.lastAccessed);
 
-	updateVisibleTabs();
+	updateVisibleTabs(query, true);
 }
 
 /**
- * Updates the visible tabs. 
  * Filters the visible tabs using the given query.
+ * If `preserveSelectedTabIndex` is set to `true`, will preserve
+ * the previously selected position, if any.
  */
-function updateVisibleTabs(query) {
+function updateVisibleTabs(query, preserveSelectedTabIndex) {
 	let tabs = allTabsSorted;
 	if (query) {
 		tabs = tabs.filter(tabsFilter(query));
 	}
 
+	// Determine the index of a tab to highlight
+	let tabIndex = 0;
+	const prevTabIndex = getSelectedTabIndex();
+	if (preserveSelectedTabIndex && prevTabIndex) {
+		const numVisibleTabs = tabs.length;
+		if (prevTabIndex < numVisibleTabs) {
+			tabIndex = prevTabIndex;
+		} else {
+			tabIndex = numVisibleTabs - 1;
+		}
+	}
+
+	// Update the body of the table with filtered tabs
 	$('#tabs_table tbody').empty().append(
 		tabs.map((tab, tabIndex) =>
 			$('<tr></tr>').append(
@@ -46,7 +60,8 @@ function updateVisibleTabs(query) {
 		)
 	);
 
-	setSelectedString(0);
+	// Highlight the selected tab
+	setSelectedString(tabIndex);
 }
 
 function tabsFilter(query) {
@@ -60,7 +75,7 @@ reloadTabs();
 
 $('#search_input')
 	.focus()
-	.on('input', e => updateVisibleTabs(e.target.value));
+	.on('input', e => updateVisibleTabs(e.target.value, false));
 
 $(window).on('keydown', event => {
 	const key = event.originalEvent.key;
@@ -81,6 +96,9 @@ $(window).on('keydown', event => {
 		window.close();
 	} else if (key === 'Enter') {
 		activateTab();
+	} else if (event.ctrlKey && key === 'Delete') {
+		closeTab();
+		event.preventDefault();
 	}
 });
 
@@ -159,6 +177,9 @@ function getTableSize() {
 	return $('#tabs_table tbody tr').length;
 }
 
+/** 
+ * Returns the index of the currently selected tab, or `undefined` if none is selected.
+ */
 function getSelectedTabIndex() {
 	return selectedString ? selectedString.data('index') : undefined;
 }
@@ -168,7 +189,7 @@ async function activateTab() {
 		return;
 	}
 
-	const tabId = selectedString.data('tabId');
+	const tabId = getSelectedTabId();
 	const tab = await browser.tabs.get(tabId);
 
 	// Switch to the target tab
@@ -187,4 +208,29 @@ async function activateTab() {
 		// Close the tab switcher pop up
 		window.close();
 	}
+}
+
+async function closeTab() {
+	if (!selectedString) {
+		return;
+	}
+
+	// Close the selected tab
+	const tabId = getSelectedTabId();
+	await browser.tabs.remove(tabId);
+
+	// Reload tabs, using the current query
+	const query = $('#search_input').val();
+	await reloadTabs(query);
+	
+	// Ensure the extension popup remains focused after potential tab switch
+	window.focus();
+}
+
+/** 
+ * Returns the browser identifier of the currently selected tab,
+ * or `undefined` if none is selected.
+ */
+function getSelectedTabId() {
+	return selectedString ? selectedString.data('tabId') : undefined;
 }
