@@ -2,12 +2,22 @@
 let selectedString;
 let allTabsSorted;
 
-async function reloadTabs(query) {
-	if (allTabsSorted === undefined) {
-		const allTabs = await browser.tabs.query({windowType: 'normal'});
-		allTabsSorted = allTabs.sort((a, b) => b.lastAccessed - a.lastAccessed);
-	}
+/**
+ * Always reloads the browser tabs and stores them to `allTabsSorted`
+ * in most-recently-used order.
+ */
+async function reloadTabs() {
+	const allTabs = await browser.tabs.query({windowType: 'normal'});
+	allTabsSorted = allTabs.sort((a, b) => b.lastAccessed - a.lastAccessed);
 
+	updateVisibleTabs();
+}
+
+/**
+ * Updates the visible tabs. 
+ * Filters the visible tabs using the given query.
+ */
+function updateVisibleTabs(query) {
 	let tabs = allTabsSorted;
 	if (query) {
 		tabs = tabs.filter(tabsFilter(query));
@@ -50,7 +60,7 @@ reloadTabs();
 
 $('#search_input')
 	.focus()
-	.on('input', e => reloadTabs(e.target.value));
+	.on('input', e => updateVisibleTabs(e.target.value));
 
 $(window).on('keydown', event => {
 	const key = event.originalEvent.key;
