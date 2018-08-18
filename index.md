@@ -4,8 +4,13 @@
 
 ## Version history
 
-Current Fast Tab Switcher version: **2.4.0**
+Current Fast Tab Switcher version: **2.5.0**
 If you experience any troubles with FTS, please create an [issue](https://github.com/tapapax/firefox-fts/issues/).
+
+### 2.5.0
+- Add Ctrl+Delete hotkey for closing active tab
+
+Thanks to dmitry-timofeev for this version.
 
 ### 2.4.0
 - Add sans-serif as the generic font family
