@@ -35,7 +35,7 @@
 
 	"name" : "Fast Tab Switcher",
 
-	"permissions" : ["tabs", "<all_urls>"],
+	"permissions" : ["tabs"],
 
 	"version" : "2.5.0"
 }
