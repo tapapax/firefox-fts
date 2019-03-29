@@ -86,7 +86,14 @@ $(window).on('keydown', event => {
 	} else if (key === 'ArrowUp') {
 		setSelectedString(getNextPageUpIndex(1));
 		event.preventDefault();
-	} else if (key === 'PageDown') {
+	} else if (event.ctrlKey && key == 'n') {
+		setSelectedString(getNextPageDownIndex(1));
+		event.preventDefault();
+	} else if (event.ctrlKey && key == 'p') {
+		setSelectedString(getNextPageUpIndex(1));
+		event.preventDefault();
+	}
+	else if (key === 'PageDown') {
 		setSelectedString(getNextPageDownIndex(13));
 		event.preventDefault();
 	} else if (key === 'PageUp') {
