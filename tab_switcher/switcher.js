@@ -80,10 +80,12 @@ $('#search_input')
 $(window).on('keydown', event => {
 	const key = event.originalEvent.key;
 
-	if (key === 'ArrowDown') {
+	if ((key === 'ArrowDown') ||
+	    (event.ctrlKey && key === 'n')) {
 		setSelectedString(getNextPageDownIndex(1));
 		event.preventDefault();
-	} else if (key === 'ArrowUp') {
+	} else if ((key === 'ArrowUp') ||
+	           (event.ctrlKey && key === 'p')) {
 		setSelectedString(getNextPageUpIndex(1));
 		event.preventDefault();
 	} else if (key === 'PageDown') {
