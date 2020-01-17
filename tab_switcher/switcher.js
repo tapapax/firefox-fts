@@ -77,15 +77,19 @@ $('#search_input')
 	.focus()
 	.on('input', e => updateVisibleTabs(e.target.value, false));
 
+enableQuickSwitch();
+
 $(window).on('keydown', event => {
 	const key = event.originalEvent.key;
 
 	if ((key === 'ArrowDown') ||
-	    (event.ctrlKey && key === 'n')) {
+	    (event.ctrlKey && key === 'n'))
+	{
 		setSelectedString(getNextPageDownIndex(1));
 		event.preventDefault();
 	} else if ((key === 'ArrowUp') ||
-	           (event.ctrlKey && key === 'p')) {
+	           (event.ctrlKey && key === 'p'))
+	{
 		setSelectedString(getNextPageUpIndex(1));
 		event.preventDefault();
 	} else if (key === 'PageDown') {
@@ -103,6 +107,50 @@ $(window).on('keydown', event => {
 		event.preventDefault();
 	}
 });
+
+
+/** 
+ * After opening with Ctrl+Space press Space again while Ctrl is still
+ * held to move selection down the list, and releasing makes the switch
+*/
+function enableQuickSwitch() {
+	const States = {
+		pending: 0,
+		enabled: 1,
+		disabled: 2,
+	};
+
+	let state = States.pending;
+
+	$(window).on('keydown', event => {
+		const key = event.originalEvent.key;
+
+		if (key === ' ' && state !== States.disabled) {
+			state = States.enabled;
+			const stringToSelect = event.shiftKey
+				? getNextPageUpIndex(1)
+				: getNextPageDownIndex(1)
+			;
+			setSelectedString(stringToSelect);
+			event.preventDefault();
+		}
+		if (key === 'Control') {
+			state = States.disabled;
+		}
+	});
+
+	$(window).on('keyup', event => {
+		const key = event.originalEvent.key;
+
+		if (key === 'Control') {
+			if (state === States.enabled) {
+				activateTab();
+			} else {
+				state = States.disable;
+			}
+		}
+	});
+}
 
 function setSelectedString(index) {
 	const table = $('#tabs_table tbody');
