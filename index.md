@@ -4,8 +4,12 @@
 
 ## Version history
 
-Current Fast Tab Switcher version: **2.5.0**
 If you experience any troubles with FTS, please create an [issue](https://github.com/tapapax/firefox-fts/issues/).
+
+### 2.6.0
+- Implement quick switch #39
+- Fix order between currently active tabs #28
+- Move to next / previous item in list with C-n, C-p (thanks to Jonathan Mastin)
 
 ### 2.5.0
 - Add Ctrl+Delete hotkey for closing active tab
