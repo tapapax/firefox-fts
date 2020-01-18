@@ -125,7 +125,7 @@ function enableQuickSwitch() {
 	$(window).on('keydown', event => {
 		const key = event.originalEvent.key;
 
-		if (key === ' ' && state !== States.disabled) {
+		if (key === ' ' && state !== States.disabled && event.ctrlKey) {
 			state = States.enabled;
 			const stringToSelect = event.shiftKey
 				? getNextPageUpIndex(1)
