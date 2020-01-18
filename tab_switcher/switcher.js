@@ -93,7 +93,13 @@ function tabsFilter(query) {
 			|| (tab.title || '').toLowerCase().indexOf(pattern) !== -1);
 }
 
-reloadTabs();
+// Initialize the tab list.
+reloadTabs().then(() => {
+	// As the top of the list is the currently active tab,
+	// move the selection to the second recently used tab
+	// (i.e., the previously active tab).
+	setSelectedString(getTableSize() <= 1 ? 0 : 1);
+});
 
 $('#search_input')
 	.focus()
