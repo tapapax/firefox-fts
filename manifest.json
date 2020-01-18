@@ -26,6 +26,10 @@
 		}
 	},
 
+	"background": {
+		"scripts": ["tab_switcher/background.js"]
+	},
+
 	"icons" : {
 		"32" : "icons/icon.png",
 		"64" : "icons/icon64.png"

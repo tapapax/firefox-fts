@@ -7,10 +7,32 @@ let allTabsSorted;
  * in most-recently-used order.
  */
 async function reloadTabs(query) {
-	const allTabs = await browser.tabs.query({windowType: 'normal'});
-	allTabsSorted = allTabs.sort((a, b) => b.lastAccessed - a.lastAccessed);
-
+	const tabs = await getAllTabs();
+	allTabsSorted = await sortTabsMru(tabs);
 	updateVisibleTabs(query, true);
+}
+
+async function getAllTabs() {
+	const allTabs = await browser.tabs.query({windowType: 'normal'});
+	return allTabs;
+}
+
+async function sortTabsMru(tabs) {
+	const windowsLastAccess = await browser.runtime.sendMessage(
+		{type: 'getWindowsLastAccess'});
+
+	const sortKey = tab => {
+		if (tab.active) {
+			// lastAccessed of active tab is always current time
+			// so we are using it's window last access
+			return windowsLastAccess.get(tab.windowId);
+		} else {
+			return tab.lastAccessed;
+		}
+	};
+
+	const sorted = tabs.sort((a, b) => sortKey(b) - sortKey(a));
+	return sorted;
 }
 
 /**
