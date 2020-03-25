@@ -1,6 +1,9 @@
 
 let selectedString;
 let allTabsSorted;
+// Maps keywords to tabs.
+let allTabKeywords;
+let isSettingKeyword = false;
 
 /**
  * Always reloads the browser tabs and stores them to `allTabsSorted`
@@ -9,12 +12,24 @@ let allTabsSorted;
 async function reloadTabs(query) {
 	const tabs = await getAllTabs();
 	allTabsSorted = await sortTabsMru(tabs);
+	allTabKeywords = await getAllTabKeywords();
 	updateVisibleTabs(query, true);
 }
 
 async function getAllTabs() {
 	const allTabs = await browser.tabs.query({windowType: 'normal'});
 	return allTabs;
+}
+
+async function getAllTabKeywords() {
+	const keywords = {};
+	for (let tab of allTabsSorted) {
+		let keyword = await browser.sessions.getTabValue(tab.id, "keyword");
+		if (keyword) {
+			keywords[keyword] = tab;
+		}
+	}
+	return keywords;
 }
 
 async function sortTabsMru(tabs) {
@@ -44,6 +59,12 @@ function updateVisibleTabs(query, preserveSelectedTabIndex) {
 	let tabs = allTabsSorted;
 	if (query) {
 		tabs = tabs.filter(tabsFilter(query));
+		// Check if this query matched a keyword for a tab.
+		const keywordTab = allTabKeywords[query];
+		if (keywordTab) {
+			// Put this at the top.
+			tabs.splice(0, 0, keywordTab);
+		}
 	}
 
 	// Determine the index of a tab to highlight
@@ -93,11 +114,40 @@ function tabsFilter(query) {
 			|| (tab.title || '').toLowerCase().indexOf(pattern) !== -1);
 }
 
+async function beginSetTabKeyword() {
+	isSettingKeyword = true;
+	const tabs = await browser.tabs.query({active: true, currentWindow: true});
+	const keyword = await browser.sessions.getTabValue(tabs[0].id, "keyword");
+	$("#tabs_table__container").hide();
+	$("#keyword_label").show();
+	$("#search_input").attr("aria-labelledby", "keyword_label")
+		// If there's an existing keyword, let the user see/edit it.
+		.val(keyword)
+		// Select it so the user can simply type over it to enter a new one.
+		.select();
+}
+
+async function setTabKeyword() {
+	const tabs = await browser.tabs.query({active: true, currentWindow: true});
+	let keyword = $('#search_input').val();
+	await browser.sessions.setTabValue(tabs[0].id, "keyword", keyword);
+	window.close();
+}
+
 reloadTabs();
 
 $('#search_input')
 	.focus()
-	.on('input', e => updateVisibleTabs(e.target.value, false));
+	.on('input', event => {
+		if (isSettingKeyword) {
+			return;
+		}
+		if (event.target.value == "=") {
+			beginSetTabKeyword();
+		} else {
+			updateVisibleTabs(event.target.value, false);
+		}
+	});
 
 enableQuickSwitch();
 
@@ -123,7 +173,11 @@ $(window).on('keydown', event => {
 	} else if (key === 'Escape') {
 		window.close();
 	} else if (key === 'Enter') {
-		activateTab();
+		if (isSettingKeyword) {
+			setTabKeyword();
+		} else {
+			activateTab();
+		}
 	} else if (event.ctrlKey && key === 'Delete') {
 		closeTab();
 		event.preventDefault();
