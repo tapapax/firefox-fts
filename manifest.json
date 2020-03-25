@@ -39,7 +39,7 @@
 
 	"name" : "Fast Tab Switcher",
 
-	"permissions" : ["tabs"],
+	"permissions" : ["tabs", "sessions"],
 
 	"version" : "2.6.0"
 }

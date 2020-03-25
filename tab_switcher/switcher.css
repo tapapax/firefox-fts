@@ -52,3 +52,7 @@ body {
 	background-color: #0A84FF;
 	border-color: #0A84FF;
 }
+
+#keyword_label {
+	width: 100vw;
+}
