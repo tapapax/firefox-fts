@@ -178,7 +178,8 @@ $(window).on('keydown', event => {
 		} else {
 			activateTab();
 		}
-	} else if (event.ctrlKey && key === 'Delete') {
+	} else if (event.ctrlKey && (key === 'Delete' || key === 'Backspace')) {
+		/* In OSX, key = `Backspace` when pressing Delete */
 		closeTab();
 		event.preventDefault();
 	}
