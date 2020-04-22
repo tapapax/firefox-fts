@@ -178,8 +178,15 @@ $(window).on('keydown', event => {
 		} else {
 			activateTab();
 		}
-	} else if (event.ctrlKey && (key === 'Delete' || key === 'Backspace')) {
-		/* In OSX, key = `Backspace` when pressing Delete */
+  } else if ((event.ctrlKey && key === 'Delete') ||
+             (event.metaKey && key === 'Backspace')) {
+    /*
+    Windows -- ideal combo: Ctrl+Delete -- alternate: Windows+Backspace
+    (`meta` is the Windows key)
+
+    OSX -- ideal combo: Cmd+Delete -- alternate: Fn+Ctrl+Delete
+    (Delete key is treated as `Backspace` unless Fn modifier is pressed)
+    */
 		closeTab();
 		event.preventDefault();
 	}
