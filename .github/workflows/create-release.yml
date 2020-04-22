@@ -1,0 +1,40 @@
+name: Create release workflow
+
+on:
+  push:
+    tags:
+    - 'ver/*'
+
+jobs:
+  build:
+    name: Create release
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Build xpi
+        run: |
+          mkdir /tmp/build
+          (cd "${GITHUB_WORKSPACE}" && git archive --format=zip -o /tmp/build/extension.xpi HEAD)
+      - name: Do create release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+
+      - name: Upload xpi to release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: /tmp/build/extension.xpi
+          asset_name: extension.xpi
+          asset_content_type: application/zip
