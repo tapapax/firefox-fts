@@ -6,6 +6,10 @@
 
 If you experience any troubles with FTS, please create an [issue](https://github.com/tapapax/firefox-fts/issues/).
 
+### 2.7.0
+- Allow a unique keyword to be assigned to a tab (by jcsteh) - https://github.com/tapapax/firefox-fts/pull/44
+- Add Cmd+Delete hotkey on OSX to close selected tab (by jasim)
+
 ### 2.6.0
 - Implement quick switch #39
 - Fix order between currently active tabs #28
