@@ -1,58 +1,83 @@
 html, body {
-	width: 100%;
-	height: 100%;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    display: flex;
+    align-items: center; /* Center vertically */
+    justify-content: center; /* Center horizontally */
+    font-family: Calibri, sans-serif;
 }
 
-body {
-	margin: 0;
-	display: flex;
-	flex-direction: column;
-	font-family: Calibri, sans-serif;
+#switcher_container {
+    width: 60%; /* Adjust as needed */
+    max-width: 800px; /* Adjust as needed */
+    background: white;
+    border: 1px solid #ccc;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    padding: 20px;
 }
 
 #search_input {
-	flex: 0;
-	font-size: large;
+    width: 100%;
+    font-size: large;
+    margin-bottom: 20px;
+    padding: 10px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 4px;
 }
 
 #tabs_table__container {
-	flex: 1;
-	overflow-y: scroll;
+    width: 100%;
+    height: 300px; /* Adjust as needed */
+    overflow-y: scroll;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
 }
 
 #tabs_table {
-	width: 100%;
-	overflow: hidden;
-	white-space: nowrap;
-	text-overflow: ellipsis;
-	table-layout: fixed;
-	border: 0;
-	font-size: 14px;
+    width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    table-layout: fixed;
+    border-collapse: collapse;
+    font-size: 14px;
 }
 
-#tabs_table td {
-	overflow: hidden;
-	text-overflow: ellipsis;
-	padding-top: 4px;
-	padding-bottom: 4px;
-	cursor: default;
-	-moz-user-select: none;
+#tabs_table td, #tabs_table th {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 8px;
+    border-bottom: 1px solid #ddd;
+    cursor: default;
+    -moz-user-select: none;
+}
+
+#tabs_table th {
+    background-color: #f4f4f4;
 }
 
 .tabs_table__column_icon {
-	width: 18px;
+    width: 18px;
 }
 
 .tabs_table__column_title {
-	width: 300px;
+    width: 300px;
 }
 
 .tabs_table__selected {
-	color: white;
-	background-color: #0A84FF;
-	border-color: #0A84FF;
+    color: white;
+    background-color: #0A84FF;
+    border-color: #0A84FF;
 }
 
 #keyword_label {
-	width: 100vw;
+    width: 100%;
+    display: block;
+    margin-top: 20px;
+    font-size: large;
 }
+
