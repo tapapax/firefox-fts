@@ -63,28 +63,70 @@ function updateVisibleTabs(query, preserveSelectedTabIndex) {
 		}
 	}
 
-	$('#tabs_table tbody').empty().append(
-		tabs.map((tab, tabIndex) =>
-			$('<tr></tr>').append(
-				$('<td></td>').append(
-					tab.favIconUrl
-						? $('<img width="16" height="16">')
-							.attr('src',
-								!tab.incognito
-									? tab.favIconUrl
-									: '/icons/mask16.svg'
-							)
-						: null
-				),
-				$('<td></td>').text(tab.title),
-				$('<td></td>').text(tab.url)
-			)
-				.data('index', tabIndex)
-				.data('tabId', tab.id)
-				.on('click', () => setSelectedString(tabIndex))
-				.on('dblclick', e => activateTab())
-		)
-	);
+	// $('#tabs_table tbody').empty().append(
+	// 	tabs.map((tab, tabIndex) =>
+	// 		$('<tr></tr>').append(
+	// 			$('<td></td>').append(
+	// 				tab.favIconUrl
+	// 					? $('<img width="16" height="16">')
+	// 						.attr('src',
+	// 							!tab.incognito
+	// 								? tab.favIconUrl
+	// 								: '/icons/mask16.svg'
+	// 						)
+	// 					: null
+	// 			),
+	// 			$('<td></td>').text(tab.title),
+	// 			$('<td></td>').text(tab.url)
+	// 		)
+	// 			.data('index', tabIndex)
+	// 			.data('tabId', tab.id)
+	// 			.on('click', () => setSelectedString(tabIndex))
+	// 			.on('dblclick', e => activateTab())
+	// 	)
+	// );
+
+	const tbody = document.getElementById('tabs_table').querySelector('tbody');
+	tbody.innerHTML = ''; // Clear existing content
+
+	tabs.forEach((tab, tabIndex) => {
+		// Create table row
+		const tr = document.createElement('tr');
+
+		// Set data attributes
+		tr.setAttribute('data-index', tabIndex);
+		tr.setAttribute('data-tab-id', tab.id);
+
+		// Click event listener
+		tr.addEventListener('click', () => setSelectedString(tabIndex));
+
+		// Double click event listener
+		tr.addEventListener('dblclick', () => activateTab(tab.id));
+
+		// Create table cells
+		const td1 = document.createElement('td');
+		if (tab.favIconUrl) {
+			const img = document.createElement('img');
+			img.width = 16;
+			img.height = 16;
+			img.src = !tab.incognito ? tab.favIconUrl : '/icons/mask16.svg';
+			td1.appendChild(img);
+		}
+
+		const td2 = document.createElement('td');
+		td2.textContent = tab.title;
+
+		const td3 = document.createElement('td');
+		td3.textContent = tab.url;
+
+		// Append cells to row
+		tr.appendChild(td1);
+		tr.appendChild(td2);
+		tr.appendChild(td3);
+
+		// Append row to tbody
+		tbody.appendChild(tr);
+	});
 
 	setSelectedString(tabIndex);
 }
@@ -96,43 +138,118 @@ function tabsFilter(query) {
 			|| (tab.title || '').toLowerCase().indexOf(pattern) !== -1);
 }
 
+// async function beginSetTabKeyword() {
+// 	isSettingKeyword = true;
+// 	const tabs = await browser.tabs.query({ active: true, currentWindow: true });
+// 	const keyword = await browser.sessions.getTabValue(tabs[0].id, "keyword");
+// 	$("#tabs_table__container").hide();
+// 	$("#keyword_label").show();
+// 	$("#search_input").attr("aria-labelledby", "keyword_label")
+// 		.val(keyword)
+// 		.select();
+// }
 async function beginSetTabKeyword() {
 	isSettingKeyword = true;
 	const tabs = await browser.tabs.query({ active: true, currentWindow: true });
 	const keyword = await browser.sessions.getTabValue(tabs[0].id, "keyword");
-	$("#tabs_table__container").hide();
-	$("#keyword_label").show();
-	$("#search_input").attr("aria-labelledby", "keyword_label")
-		.val(keyword)
-		.select();
+
+	// Hide tabs table container
+	const tabsTableContainer = document.getElementById('tabs_table__container');
+	tabsTableContainer.style.display = 'none';
+
+	// Show keyword label
+	const keywordLabel = document.getElementById('keyword_label');
+	keywordLabel.style.display = 'block';
+
+	// Set aria-labelledby attribute for search input
+	const searchInput = document.getElementById('search_input');
+	searchInput.setAttribute('aria-labelledby', 'keyword_label');
+
+	// Set value and select text in search input
+	searchInput.value = keyword || '';
+	searchInput.select();
 }
+
+
+// async function setTabKeyword() {
+// 	const tabs = await browser.tabs.query({ active: true, currentWindow: true });
+// 	let keyword = $('#search_input').val();
+// 	await browser.sessions.setTabValue(tabs[0].id, "keyword", keyword);
+// 	window.close();
+// }
 
 async function setTabKeyword() {
 	const tabs = await browser.tabs.query({ active: true, currentWindow: true });
-	let keyword = $('#search_input').val();
+	const keyword = document.getElementById('search_input').value;
 	await browser.sessions.setTabValue(tabs[0].id, "keyword", keyword);
 	window.close();
 }
 
 reloadTabs();
 
-$('#search_input')
-	.focus()
-	.on('input', event => {
-		if (isSettingKeyword) {
-			return;
-		}
-		if (event.target.value == "=") {
-			beginSetTabKeyword();
-		} else {
-			updateVisibleTabs(event.target.value, false);
-		}
-	});
+// $('#search_input')
+// 	.focus()
+// 	.on('input', event => {
+// 		if (isSettingKeyword) {
+// 			return;
+// 		}
+// 		if (event.target.value == "=") {
+// 			beginSetTabKeyword();
+// 		} else {
+// 			updateVisibleTabs(event.target.value, false);
+// 		}
+// 	});
+
+document.getElementById('search_input').addEventListener('input', function(event) {
+	if (isSettingKeyword) {
+		return;
+	}
+	if (event.target.value === "=") {
+		beginSetTabKeyword();
+	} else {
+		updateVisibleTabs(event.target.value, false);
+	}
+});
+
+// Focus on search input
+document.getElementById('search_input').focus();
 
 enableQuickSwitch();
 
-$(window).on('keydown', event => {
-	const key = event.originalEvent.key;
+// $(window).on('keydown', event => {
+// 	const key = event.originalEvent.key;
+//
+// 	if ((key === 'ArrowDown') ||
+// 		(event.ctrlKey && key === 'n')) {
+// 		setSelectedString(getNextPageDownIndex(1));
+// 		event.preventDefault();
+// 	} else if ((key === 'ArrowUp') ||
+// 		(event.ctrlKey && key === 'p')) {
+// 		setSelectedString(getNextPageUpIndex(1));
+// 		event.preventDefault();
+// 	} else if (key === 'PageDown') {
+// 		setSelectedString(getNextPageDownIndex(13));
+// 		event.preventDefault();
+// 	} else if (key === 'PageUp') {
+// 		setSelectedString(getNextPageUpIndex(13));
+// 		event.preventDefault();
+// 	} else if (key === 'Escape') {
+// 		window.close();
+// 	} else if (key === 'Enter') {
+// 		if (isSettingKeyword) {
+// 			setTabKeyword();
+// 		} else {
+// 			activateTab();
+// 		}
+// 	} else if ((event.ctrlKey && key === 'Delete') ||
+// 		(event.metaKey && key === 'Backspace')) {
+// 		closeTab();
+// 		event.preventDefault();
+// 	}
+// });
+
+window.addEventListener('keydown', event => {
+	const key = event.key;
 
 	if ((key === 'ArrowDown') ||
 		(event.ctrlKey && key === 'n')) {
@@ -163,6 +280,44 @@ $(window).on('keydown', event => {
 	}
 });
 
+// function enableQuickSwitch() {
+// 	const States = {
+// 		pending: 0,
+// 		enabled: 1,
+// 		disabled: 2,
+// 	};
+//
+// 	let state = States.pending;
+//
+// 	$(window).on('keydown', event => {
+// 		const key = event.originalEvent.key;
+//
+// 		if (key === ' ' && state !== States.disabled && event.ctrlKey) {
+// 			state = States.enabled;
+// 			const stringToSelect = event.shiftKey
+// 				? getNextPageUpIndex(1)
+// 				: getNextPageDownIndex(1);
+// 			setSelectedString(stringToSelect);
+// 			event.preventDefault();
+// 		}
+// 		if (key === 'Control') {
+// 			state = States.disabled;
+// 		}
+// 	});
+//
+// 	$(window).on('keyup', event => {
+// 		const key = event.originalEvent.key;
+//
+// 		if (key === 'Control') {
+// 			if (state === States.enabled) {
+// 				activateTab();
+// 			} else {
+// 				state = States.disable;
+// 			}
+// 		}
+// 	});
+// }
+
 function enableQuickSwitch() {
 	const States = {
 		pending: 0,
@@ -172,8 +327,8 @@ function enableQuickSwitch() {
 
 	let state = States.pending;
 
-	$(window).on('keydown', event => {
-		const key = event.originalEvent.key;
+	window.addEventListener('keydown', event => {
+		const key = event.key;
 
 		if (key === ' ' && state !== States.disabled && event.ctrlKey) {
 			state = States.enabled;
@@ -183,83 +338,181 @@ function enableQuickSwitch() {
 			setSelectedString(stringToSelect);
 			event.preventDefault();
 		}
+
 		if (key === 'Control') {
 			state = States.disabled;
 		}
 	});
 
-	$(window).on('keyup', event => {
-		const key = event.originalEvent.key;
+	window.addEventListener('keyup', event => {
+		const key = event.key;
 
 		if (key === 'Control') {
 			if (state === States.enabled) {
 				activateTab();
 			} else {
-				state = States.disable;
+				state = States.disabled;
 			}
 		}
 	});
 }
+// function setSelectedString(index) {
+// 	const table = $('#tabs_table tbody');
+// 	const selector = `tr:nth-child(${index + 1})`;
+//
+// 	if (selectedString) {
+// 		selectedString.removeClass('tabs_table__selected');
+// 	}
+// 	selectedString = table.find(selector).addClass('tabs_table__selected');
+// 	scrollIntoView();
+// }
+
 
 function setSelectedString(index) {
-	const table = $('#tabs_table tbody');
-	const selector = String.raw`tr:nth-child(${index + 1})`;
+	const table = document.querySelector('#tabs_table tbody');
+	const selector = `tr:nth-child(${index + 1})`;
 
 	if (selectedString) {
-		selectedString.removeClass('tabs_table__selected');
+		selectedString.classList.remove('tabs_table__selected');
 	}
-	selectedString = table.find(selector).addClass('tabs_table__selected');
+
+	selectedString = table.querySelector(selector);
+	if (selectedString) {
+		selectedString.classList.add('tabs_table__selected');
+	}
+
 	scrollIntoView();
 }
 
+// function getSelectedTabIndex() {
+// 	const selected = $('#tabs_table .tabs_table__selected');
+// 	if (selected.length === 0) {
+// 		return 0;
+// 	} else {
+// 		return selected.data('index');
+// 	}
+// }
+
 function getSelectedTabIndex() {
-	const selected = $('#tabs_table .tabs_table__selected');
-	if (selected.length === 0) {
+	const selected = document.querySelector('#tabs_table .tabs_table__selected');
+	if (!selected) {
 		return 0;
 	} else {
-		return selected.data('index');
+		return parseInt(selected.getAttribute('data-index'));
 	}
 }
+
+// function getNextPageDownIndex(stepSize) {
+// 	const tabIndex = getSelectedTabIndex();
+// 	const numVisibleTabs = $('#tabs_table tbody tr').length;
+// 	return (tabIndex + stepSize) % numVisibleTabs;
+// }
 
 function getNextPageDownIndex(stepSize) {
 	const tabIndex = getSelectedTabIndex();
-	const numVisibleTabs = $('#tabs_table tbody tr').length;
+	const numVisibleTabs = document.querySelectorAll('#tabs_table tbody tr').length;
 	return (tabIndex + stepSize) % numVisibleTabs;
 }
 
+// function getNextPageUpIndex(stepSize) {
+// 	const tabIndex = getSelectedTabIndex();
+// 	const numVisibleTabs = $('#tabs_table tbody tr').length;
+// 	return (tabIndex - stepSize + numVisibleTabs) % numVisibleTabs;
+// }
+
 function getNextPageUpIndex(stepSize) {
 	const tabIndex = getSelectedTabIndex();
-	const numVisibleTabs = $('#tabs_table tbody tr').length;
+	const numVisibleTabs = document.querySelectorAll('#tabs_table tbody tr').length;
 	return (tabIndex - stepSize + numVisibleTabs) % numVisibleTabs;
 }
 
+// function scrollIntoView() {
+// 	const container = $('#tabs_table__container');
+// 	const scrollTop = container.scrollTop();
+// 	const scrollBottom = scrollTop + container.height();
+//
+// 	const elem = selectedString;
+// 	const elemTop = elem.position().top;
+// 	const elemBottom = elemTop + elem.height();
+//
+// 	if (elemBottom > scrollBottom) {
+// 		container.scrollTop(scrollTop + elemBottom - scrollBottom);
+// 	} else if (elemTop < 0) {
+// 		container.scrollTop(scrollTop + elemTop);
+// 	}
+// }
+
 function scrollIntoView() {
-	const container = $('#tabs_table__container');
-	const scrollTop = container.scrollTop();
-	const scrollBottom = scrollTop + container.height();
+	const container = document.getElementById('tabs_table__container');
+	const scrollTop = container.scrollTop;
+	const scrollBottom = scrollTop + container.clientHeight;
 
 	const elem = selectedString;
-	const elemTop = elem.position().top;
-	const elemBottom = elemTop + elem.height();
+	const elemTop = elem.offsetTop;
+	const elemBottom = elemTop + elem.offsetHeight;
 
 	if (elemBottom > scrollBottom) {
-		container.scrollTop(scrollTop + elemBottom - scrollBottom);
-	} else if (elemTop < 0) {
-		container.scrollTop(scrollTop + elemTop);
+		container.scrollTop = scrollTop + (elemBottom - scrollBottom);
+	} else if (elemTop < scrollTop) {
+		container.scrollTop = elemTop;
 	}
 }
 
+// async function activateTab() {
+// 	const tabId = selectedString.data('tabId');
+// 	const tab = await browser.tabs.get(tabId);
+// 	await browser.tabs.update(tab.id, { active: true });
+// 	await browser.windows.update(tab.windowId, { focused: true });
+// 	window.close();
+// }
+
+// async function activateTab() {
+// 	const tabId = selectedString.data('tabId');
+// 	const tab = await browser.tabs.get(parseInt(tabId));
+//
+// 	if (tab) {
+// 		await browser.tabs.update(tab.id, { active: true });
+//
+// 		const currentWin = await browser.windows.getCurrent();
+// 		if (currentWin.id !== tab.windowId) {
+// 			await browser.windows.update(tab.windowId, { focused: true });
+// 		} else {
+// 			window.close();
+// 		}
+// 	}
+// }
+
 async function activateTab() {
-	const tabId = selectedString.data('tabId');
-	const tab = await browser.tabs.get(tabId);
-	await browser.tabs.update(tab.id, { active: true });
-	await browser.windows.update(tab.windowId, { focused: true });
-	window.close();
+	// Ensure selectedString is defined and has the required data attribute
+	if (selectedString && selectedString.dataset.tabId) {
+		const tabId = selectedString.dataset.tabId;
+		const tab = await browser.tabs.get(parseInt(tabId));
+
+		if (tab) {
+			await browser.tabs.update(tab.id, { active: true });
+
+			const currentWin = await browser.windows.getCurrent();
+			if (currentWin.id !== tab.windowId) {
+				await browser.windows.update(tab.windowId, { focused: true });
+			} else {
+				window.close();
+			}
+		}
+	}
 }
 
+// async function closeTab() {
+// 	const tabId = selectedString.data('tabId');
+// 	await browser.tabs.remove(tabId);
+// 	reloadTabs();
+// }
+
 async function closeTab() {
-	const tabId = selectedString.data('tabId');
-	await browser.tabs.remove(tabId);
-	reloadTabs();
+	// Ensure selectedString is defined and has the required data attribute
+	if (selectedString && selectedString.dataset.tabId) {
+		const tabId = selectedString.dataset.tabId;
+		await browser.tabs.remove(parseInt(tabId));
+		reloadTabs();
+	}
 }
 
