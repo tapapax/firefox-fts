@@ -33,6 +33,7 @@
         "scripts": ["tab_switcher/background.js"],
         "persistent": true
     },
+
     "icons": {
         "32": "icons/icon.png",
         "64": "icons/icon64.png"
@@ -42,3 +43,4 @@
         "sessions"
     ]
 }
+
