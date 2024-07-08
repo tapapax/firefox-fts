@@ -1,45 +1,46 @@
 {
-	"applications" : {
-		"gecko" : {
-			"id" : "tabswitcher@volinsky.net"
-		}
-	},
+    "manifest_version": 2,
+    "name": "Fast Tab Switcher",
+    "version": "2.7.0",
 
-	"browser_action" : {
-		"default_icon" : "icons/icon64.png",
-		"default_title" : "Open \"Fast Tab Switcher\" popup",
-		"default_area" : "tabstrip",
-		"default_popup" : "tab_switcher/switcher.html"
-	},
+    "applications": {
+        "gecko": {
+            "id": "yassinecourrier@gmail.com"
+        }
+    },
 
-	"options_ui": {
-		"page": "options/options.html"
-	},
+    "browser_action": {
+        "default_icon": "icons/icon64.png",
+        "default_title": "Open \"Fast Tab Switcher\" popup",
+        "default_popup": "tab_switcher/switcher.html"
+    },
 
-	"commands" : {
-		"_execute_browser_action" : {
-			"suggested_key" : {
-				"default" : "Ctrl+Space",
-				"mac" : "MacCtrl+Space"
-			},
-			"description" : "Open \"Fast Tab Switcher\" popup"
-		}
-	},
+    "options_ui": {
+        "page": "options/options.html"
+    },
 
-	"background": {
-		"scripts": ["tab_switcher/background.js"]
-	},
+    "commands": {
+        "_execute_browser_action": {
+            "suggested_key": {
+                "default": "Ctrl+Space",
+                "mac": "MacCtrl+Space"
+            },
+            "description": "Open \"Fast Tab Switcher\" popup"
+        }
+    },
 
-	"icons" : {
-		"32" : "icons/icon.png",
-		"64" : "icons/icon64.png"
-	},
+    "background": {
+        "scripts": ["tab_switcher/background.js"],
+        "persistent": true
+    },
 
-	"manifest_version" : 2,
-
-	"name" : "Fast Tab Switcher",
-
-	"permissions" : ["tabs", "sessions"],
-
-	"version" : "2.7.0"
+    "icons": {
+        "32": "icons/icon.png",
+        "64": "icons/icon64.png"
+    },
+    "permissions": [
+        "tabs",
+        "sessions"
+    ]
 }
+
