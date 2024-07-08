@@ -5,7 +5,7 @@
 
     "applications": {
         "gecko": {
-            "id": "tabswitcher@volinsky.net"
+            "id": "yassinecourrier@gmail.com"
         }
     },
 
@@ -31,17 +31,14 @@
 
     "background": {
         "scripts": ["tab_switcher/background.js"],
-        "persistent": false
+        "persistent": true
     },
-
     "icons": {
         "32": "icons/icon.png",
         "64": "icons/icon64.png"
     },
-
     "permissions": [
         "tabs",
         "sessions"
     ]
 }
-

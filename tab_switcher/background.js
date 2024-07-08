@@ -33,3 +33,33 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
 		sendResponse(windowsLastAccess);
 	}
 });
+// // Function to center the popup window
+// function centerPopup() {
+// 	console.log("hi");
+// 	// Get the screen's width and height
+// 	const screenWidth = window.screen.availWidth;
+// 	const screenHeight = window.screen.availHeight;
+//
+// 	// Set the desired width and height of your popup
+// 	const popupWidth = 800;
+// 	const popupHeight = 600;
+//
+// 	// Calculate the position to center the window
+// 	const left = Math.round((screenWidth / 2) - (popupWidth / 2));
+// 	const top = Math.round((screenHeight / 2) - (popupHeight / 2));
+//
+// 	// Resize and move the popup window
+// 	browser.windows.update(browser.windows.WINDOW_ID_CURRENT, {
+// 		left: Math.max(left, 0),
+// 		top: Math.max(top, 0),
+// 		width: popupWidth,
+// 		height: popupHeight
+// 	});
+// }
+//
+// centerPopup();
+// // Add event listener for when the DOM content is loaded
+// window.addEventListener("DOMContentLoaded", () => {
+// 	centerPopup();
+// });
+//

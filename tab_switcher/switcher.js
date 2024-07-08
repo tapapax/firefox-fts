@@ -279,7 +279,6 @@ async function closeTab() {
 //
 
 window.addEventListener("DOMContentLoaded", () => {
-	console.log("HIIIIIIIIIIIIIIIIIIIIIIII");
 	reloadTabs();
 
 	document.getElementById('search_input').addEventListener('input', function(event) {
@@ -333,3 +332,19 @@ window.addEventListener("DOMContentLoaded", () => {
 
 });
 
+// document.addEventListener("DOMContentLoaded", function() {
+// 	const container = document.getElementById('switcher_container');
+//
+// 	const screenWidth = window.screen.availWidth;
+// 	const screenHeight = window.screen.availHeight;
+// 	console.log("--->", screenHeight, screenWidth);
+// 	const popupWidth = 800;
+// 	const popupHeight = 600;
+// 	const left = (screenWidth - popupWidth) / 2;
+// 	const top = (screenHeight - popupHeight) / 2;
+//
+// 	container.style.width = popupWidth + 'px';
+// 	container.style.height = popupHeight + 'px';
+// 	container.style.left = left + 'px';
+// 	container.style.top = top + 'px';
+// });
