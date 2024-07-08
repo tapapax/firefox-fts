@@ -2,31 +2,23 @@
     "manifest_version": 2,
     "name": "Fast Tab Switcher",
     "version": "2.7.0",
-    "description": "Allows fast switching between tabs.",
-    "permissions": [
-        "tabs",
-        "sessions"
-    ],
-    "icons": {
-        "32": "icons/icon.png",
-        "64": "icons/icon64.png"
-    },
+
     "applications": {
         "gecko": {
             "id": "tabswitcher@volinsky.net"
         }
     },
+
     "browser_action": {
-        "default_icon": {
-            "16": "icons/icon16.png",
-            "32": "icons/icon32.png"
-        },
+        "default_icon": "icons/icon64.png",
         "default_title": "Open \"Fast Tab Switcher\" popup",
         "default_popup": "tab_switcher/switcher.html"
     },
+
     "options_ui": {
         "page": "options/options.html"
     },
+
     "commands": {
         "_execute_browser_action": {
             "suggested_key": {
@@ -36,11 +28,20 @@
             "description": "Open \"Fast Tab Switcher\" popup"
         }
     },
+
     "background": {
-        "scripts": [
-            "tab_switcher/background.js"
-        ],
+        "scripts": ["tab_switcher/background.js"],
         "persistent": false
-    }
+    },
+
+    "icons": {
+        "32": "icons/icon.png",
+        "64": "icons/icon64.png"
+    },
+
+    "permissions": [
+        "tabs",
+        "sessions"
+    ]
 }
 
