@@ -22,10 +22,18 @@ async function getAllTabs() {
 
 async function getAllTabKeywords() {
 	const keywords = {};
-	for (let tab of allTabsSorted) {
-		let keyword = await browser.sessions.getTabValue(tab.id, "keyword");
+	const keywordPromises = allTabsSorted.map(async tab => {
+		const keyword = await browser.sessions.getTabValue(tab.id, "keyword");
 		if (keyword) {
-			keywords[keyword] = tab;
+			return { keyword, tab };
+		}
+		return null;
+	});
+
+	const results = await Promise.all(keywordPromises);
+	for (const result of results) {
+		if (result) {
+			keywords[result.keyword] = result.tab;
 		}
 	}
 	return keywords;
