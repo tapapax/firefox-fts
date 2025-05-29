@@ -1,4 +1,3 @@
-
 let selectedString;
 let allTabsSorted;
 // Maps keywords to tabs.
@@ -80,28 +79,41 @@ function updateVisibleTabs(query, preserveSelectedTabIndex) {
 	}
 
 	// Update the body of the table with filtered tabs
-	$('#tabs_table tbody').empty().append(
-		tabs.map((tab, tabIndex) =>
-			$('<tr></tr>').append(
-				$('<td></td>').append(
-					tab.favIconUrl
-						? $('<img width="16" height="16">')
-							.attr('src',
-								!tab.incognito
-									? tab.favIconUrl
-									: '/icons/mask16.svg'
-							)
-						: null
-				),
-				$('<td></td>').text(tab.title),
-				$('<td></td>').text(tab.url),
-			)
-			.data('index', tabIndex)
-			.data('tabId', tab.id)
-			.on('click', () => setSelectedString(tabIndex))
-			.on('dblclick', e => activateTab())
-		)
-	);
+	const tbody = document.querySelector('#tabs_table tbody');
+	tbody.innerHTML = '';
+
+	tabs.forEach((tab, tabIndex) => {
+		const tr = document.createElement('tr');
+
+		// First column (favicon)
+		const tdIcon = document.createElement('td');
+		if (tab.favIconUrl) {
+			const img = document.createElement('img');
+			img.width = 16;
+			img.height = 16;
+			img.src = !tab.incognito ? tab.favIconUrl : '/icons/mask16.svg';
+			tdIcon.appendChild(img);
+		}
+		tr.appendChild(tdIcon);
+
+		// Second column (title)
+		const tdTitle = document.createElement('td');
+		tdTitle.textContent = tab.title;
+		tr.appendChild(tdTitle);
+
+		// Third column (url)
+		const tdUrl = document.createElement('td');
+		tdUrl.textContent = tab.url;
+		tr.appendChild(tdUrl);
+
+		// Store data attributes and add event listeners
+		tr.dataset.index = tabIndex;
+		tr.dataset.tabId = tab.id;
+		tr.addEventListener('click', () => setSelectedString(tabIndex));
+		tr.addEventListener('dblclick', () => activateTab());
+
+		tbody.appendChild(tr);
+	});
 
 	// Highlight the selected tab
 	setSelectedString(tabIndex);
@@ -118,41 +130,43 @@ async function beginSetTabKeyword() {
 	isSettingKeyword = true;
 	const tabs = await browser.tabs.query({active: true, currentWindow: true});
 	const keyword = await browser.sessions.getTabValue(tabs[0].id, "keyword");
-	$("#tabs_table__container").hide();
-	$("#keyword_label").show();
-	$("#search_input").attr("aria-labelledby", "keyword_label")
-		// If there's an existing keyword, let the user see/edit it.
-		.val(keyword)
-		// Select it so the user can simply type over it to enter a new one.
-		.select();
+	document.getElementById("tabs_table__container").style.display = "none";
+	document.getElementById("keyword_label").style.display = "block";
+
+	const searchInput = document.getElementById("search_input");
+	searchInput.setAttribute("aria-labelledby", "keyword_label");
+	// If there's an existing keyword, let the user see/edit it.
+	searchInput.value = keyword || "";
+	// Select it so the user can simply type over it to enter a new one.
+	searchInput.select();
 }
 
 async function setTabKeyword() {
 	const tabs = await browser.tabs.query({active: true, currentWindow: true});
-	let keyword = $('#search_input').val();
+	let keyword = document.getElementById('search_input').value;
 	await browser.sessions.setTabValue(tabs[0].id, "keyword", keyword);
 	window.close();
 }
 
 reloadTabs();
 
-$('#search_input')
-	.focus()
-	.on('input', event => {
-		if (isSettingKeyword) {
-			return;
-		}
-		if (event.target.value == "=") {
-			beginSetTabKeyword();
-		} else {
-			updateVisibleTabs(event.target.value, false);
-		}
-	});
+const searchInput = document.getElementById('search_input');
+searchInput.focus();
+searchInput.addEventListener('input', event => {
+	if (isSettingKeyword) {
+		return;
+	}
+	if (event.target.value == "=") {
+		beginSetTabKeyword();
+	} else {
+		updateVisibleTabs(event.target.value, false);
+	}
+});
 
 enableQuickSwitch();
 
-$(window).on('keydown', event => {
-	const key = event.originalEvent.key;
+window.addEventListener('keydown', event => {
+	const key = event.key;
 
 	if ((key === 'ArrowDown') ||
 	    (event.ctrlKey && key === 'n'))
@@ -193,7 +207,7 @@ $(window).on('keydown', event => {
 });
 
 
-/** 
+/**
  * After opening with Ctrl+Space press Space again while Ctrl is still
  * held to move selection down the list, and releasing makes the switch
 */
@@ -206,8 +220,8 @@ function enableQuickSwitch() {
 
 	let state = States.pending;
 
-	$(window).on('keydown', event => {
-		const key = event.originalEvent.key;
+	window.addEventListener('keydown', event => {
+		const key = event.key;
 
 		if (key === ' ' && state !== States.disabled && event.ctrlKey) {
 			state = States.enabled;
@@ -223,8 +237,8 @@ function enableQuickSwitch() {
 		}
 	});
 
-	$(window).on('keyup', event => {
-		const key = event.originalEvent.key;
+	window.addEventListener('keyup', event => {
+		const key = event.key;
 
 		if (key === 'Control') {
 			if (state === States.enabled) {
@@ -237,19 +251,18 @@ function enableQuickSwitch() {
 }
 
 function setSelectedString(index) {
-	const table = $('#tabs_table tbody');
+	const table = document.querySelector('#tabs_table tbody');
 
-	const selector = String.raw`tr:nth-child(${index+1})`;
-	const newSelected = table.find(selector);
-	if (!newSelected.length || index < 0) {
+	const newSelected = table.querySelector(`tr:nth-child(${index+1})`);
+	if (!newSelected || index < 0) {
 		return;
 	}
 
 	if (selectedString) {
-		selectedString.removeClass('tabs_table__selected');
+		selectedString.classList.remove('tabs_table__selected');
 	}
 
-	newSelected.addClass('tabs_table__selected');
+	newSelected.classList.add('tabs_table__selected');
 
 	selectedString = newSelected;
 
@@ -263,25 +276,25 @@ function scrollToSelection() {
 
 	const scrollPadding = 20;
 
-	const tableContainer = $('#tabs_table__container');
-	const stringOffset = selectedString[0].offsetTop;
+	const tableContainer = document.getElementById('tabs_table__container');
+	const stringOffset = selectedString.offsetTop;
 	const scrollMax = stringOffset - scrollPadding;
 	const scrollMin = stringOffset
-		+ selectedString.height() - tableContainer.height() + scrollPadding;
+		+ selectedString.offsetHeight - tableContainer.offsetHeight + scrollPadding;
 
 	if (scrollMax < scrollMin) {
 		// Resetting scroll since there is no enough space
-		tableContainer.scrollTop(0);
+		tableContainer.scrollTop = 0;
 		return;
 	}
 
 	const scrollValue = Math.max(0, scrollMin,
-		Math.min(scrollMax, tableContainer.scrollTop()));
-	tableContainer.scrollTop(scrollValue);
+		Math.min(scrollMax, tableContainer.scrollTop));
+	tableContainer.scrollTop = scrollValue;
 }
 
-/** 
- * Returns an index of the next tab in the list, if we go pageSize _up_ the list. 
+/**
+ * Returns an index of the next tab in the list, if we go pageSize _up_ the list.
  * If we are already at the top, then the next index is the index of the last (bottom) tab.
  */
 function getNextPageUpIndex(pageSize) {
@@ -293,8 +306,8 @@ function getNextPageUpIndex(pageSize) {
 	}
 }
 
-/** 
- * Returns an index of the next tab in the list, if we go pageSize _down_ the list. 
+/**
+ * Returns an index of the next tab in the list, if we go pageSize _down_ the list.
  * If we are already at the bottom, then the next index is the index of the first (top) tab.
  */
 function getNextPageDownIndex(pageSize) {
@@ -308,14 +321,14 @@ function getNextPageDownIndex(pageSize) {
 }
 
 function getTableSize() {
-	return $('#tabs_table tbody tr').length;
+	return document.querySelectorAll('#tabs_table tbody tr').length;
 }
 
-/** 
+/**
  * Returns the index of the currently selected tab, or `undefined` if none is selected.
  */
 function getSelectedTabIndex() {
-	return selectedString ? selectedString.data('index') : undefined;
+	return selectedString ? parseInt(selectedString.dataset.index) : undefined;
 }
 
 async function activateTab() {
@@ -354,17 +367,17 @@ async function closeTab() {
 	await browser.tabs.remove(tabId);
 
 	// Reload tabs, using the current query
-	const query = $('#search_input').val();
+	const query = document.getElementById('search_input').value;
 	await reloadTabs(query);
-	
+
 	// Ensure the extension popup remains focused after potential tab switch
 	window.focus();
 }
 
-/** 
+/**
  * Returns the browser identifier of the currently selected tab,
  * or `undefined` if none is selected.
  */
 function getSelectedTabId() {
-	return selectedString ? selectedString.data('tabId') : undefined;
+	return selectedString ? parseInt(selectedString.dataset.tabId) : undefined;
 }
