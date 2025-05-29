@@ -9,23 +9,15 @@
 
 <input id="search_input"></input>
 
-<div id="tabs_table__container">
-	<table id="tabs_table" cellspacing="0">
-		<col class="tabs_table__column_icon">
-		<col class="tabs_table__column_title">
-		<col class="tabs_table__column_url">
-
-		<thead>
-			<tr>
-				<th></th>
-				<th>Title</th>
-				<th>Url</th>
-			</tr>
-		</thead>
-
-		<tbody>
-		</tbody>
-	</table>
+<div id="tabs_container">
+	<div class="tabs_header">
+		<div class="tab_icon_header"></div>
+		<div class="tab_title_header">Title</div>
+		<div class="tab_url_header">Url</div>
+	</div>
+	<div id="tabs_list">
+		<!-- Tab items will be inserted here -->
+	</div>
 </div>
 
 <label id="keyword_label" hidden>Enter keyword to assign to this tab</label>

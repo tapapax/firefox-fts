@@ -86,44 +86,48 @@ function updateVisibleTabs(query, preserveSelectedTabIndex) {
 		}
 	}
 
-	// Update the body of the table with filtered tabs
-	const tbody = document.querySelector('#tabs_table tbody');
-	tbody.innerHTML = '';
+	// Update the tabs list with filtered tabs
+	const tabsList = document.getElementById('tabs_list');
+	tabsList.innerHTML = '';
 
 	const fragment = document.createDocumentFragment();
 
 	tabs.forEach((tab, tabIndex) => {
-		const tr = document.createElement('tr');
+		const tabItem = document.createElement('div');
+		tabItem.className = 'tab_item';
 
-		// First column (favicon)
-		const tdIcon = document.createElement('td');
+		// Icon section
+		const iconDiv = document.createElement('div');
+		iconDiv.className = 'tab_icon';
 		if (tab.favIconUrl) {
 			const img = document.createElement('img');
 			img.width = 16;
 			img.height = 16;
 			img.src = !tab.incognito ? tab.favIconUrl : '/icons/mask16.svg';
-			tdIcon.appendChild(img);
+			iconDiv.appendChild(img);
 		}
-		tr.appendChild(tdIcon);
+		tabItem.appendChild(iconDiv);
 
-		// Second column (title)
-		const tdTitle = document.createElement('td');
-		tdTitle.textContent = tab.title;
-		tr.appendChild(tdTitle);
+		// Title section
+		const titleDiv = document.createElement('div');
+		titleDiv.className = 'tab_title';
+		titleDiv.textContent = tab.title;
+		tabItem.appendChild(titleDiv);
 
-		// Third column (url)
-		const tdUrl = document.createElement('td');
-		tdUrl.textContent = tab.url;
-		tr.appendChild(tdUrl);
+		// URL section
+		const urlDiv = document.createElement('div');
+		urlDiv.className = 'tab_url';
+		urlDiv.textContent = tab.url;
+		tabItem.appendChild(urlDiv);
 
 		// Store data attributes
-		tr.dataset.index = tabIndex;
-		tr.dataset.tabId = tab.id;
+		tabItem.dataset.index = tabIndex;
+		tabItem.dataset.tabId = tab.id;
 
-		fragment.appendChild(tr);
+		fragment.appendChild(tabItem);
 	});
 
-	tbody.appendChild(fragment);
+	tabsList.appendChild(fragment);
 
 	// Highlight the selected tab
 	setSelectedString(tabIndex);
@@ -140,7 +144,7 @@ async function beginSetTabKeyword() {
 	isSettingKeyword = true;
 	const tabs = await browser.tabs.query({active: true, currentWindow: true});
 	const keyword = await browser.sessions.getTabValue(tabs[0].id, "keyword");
-	document.getElementById("tabs_table__container").style.display = "none";
+	document.getElementById("tabs_container").style.display = "none";
 	document.getElementById("keyword_label").style.display = "block";
 
 	const searchInput = document.getElementById("search_input");
@@ -263,18 +267,18 @@ function enableQuickSwitch() {
 }
 
 function setSelectedString(index) {
-	const table = document.querySelector('#tabs_table tbody');
+	const tabsList = document.getElementById('tabs_list');
 
-	const newSelected = table.querySelector(`tr:nth-child(${index+1})`);
+	const newSelected = tabsList.querySelector(`.tab_item:nth-child(${index+1})`);
 	if (!newSelected || index < 0) {
 		return;
 	}
 
 	if (selectedString) {
-		selectedString.classList.remove('tabs_table__selected');
+		selectedString.classList.remove('selected');
 	}
 
-	newSelected.classList.add('tabs_table__selected');
+	newSelected.classList.add('selected');
 
 	selectedString = newSelected;
 
@@ -282,27 +286,15 @@ function setSelectedString(index) {
 }
 
 function scrollToSelection() {
-	if (!selectedString) {
-		return;
-	}
+  if (!selectedString) {
+    return;
+  }
 
-	const scrollPadding = 20;
-
-	const tableContainer = document.getElementById('tabs_table__container');
-	const stringOffset = selectedString.offsetTop;
-	const scrollMax = stringOffset - scrollPadding;
-	const scrollMin = stringOffset
-		+ selectedString.offsetHeight - tableContainer.offsetHeight + scrollPadding;
-
-	if (scrollMax < scrollMin) {
-		// Resetting scroll since there is no enough space
-		tableContainer.scrollTop = 0;
-		return;
-	}
-
-	const scrollValue = Math.max(0, scrollMin,
-		Math.min(scrollMax, tableContainer.scrollTop));
-	tableContainer.scrollTop = scrollValue;
+  selectedString.scrollIntoView({
+    behavior: 'auto',
+    block: 'nearest',
+    inline: 'nearest'
+  });
 }
 
 /**
@@ -333,7 +325,7 @@ function getNextPageDownIndex(pageSize) {
 }
 
 function getTableSize() {
-	return document.querySelectorAll('#tabs_table tbody tr').length;
+	return document.querySelectorAll('#tabs_list .tab_item').length;
 }
 
 /**
@@ -395,18 +387,18 @@ function getSelectedTabId() {
 }
 
 function setupTableEventListeners() {
-	const tbody = document.querySelector('#tabs_table tbody');
+	const tabsList = document.getElementById('tabs_list');
 
-	tbody.addEventListener('click', (event) => {
-		const tr = event.target.closest('tr');
-		if (tr) {
-			setSelectedString(parseInt(tr.dataset.index));
+	tabsList.addEventListener('click', (event) => {
+		const tabItem = event.target.closest('.tab_item');
+		if (tabItem) {
+			setSelectedString(parseInt(tabItem.dataset.index));
 		}
 	});
 
-	tbody.addEventListener('dblclick', (event) => {
-		const tr = event.target.closest('tr');
-		if (tr) {
+	tabsList.addEventListener('dblclick', (event) => {
+		const tabItem = event.target.closest('.tab_item');
+		if (tabItem) {
 			activateTab();
 		}
 	});
