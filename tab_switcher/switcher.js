@@ -230,7 +230,7 @@ function enableQuickSwitch() {
 			if (state === States.enabled) {
 				activateTab();
 			} else {
-				state = States.disable;
+				state = States.disabled;
 			}
 		}
 	});
