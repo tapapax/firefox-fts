@@ -82,6 +82,8 @@ function updateVisibleTabs(query, preserveSelectedTabIndex) {
 	const tbody = document.querySelector('#tabs_table tbody');
 	tbody.innerHTML = '';
 
+	const fragment = document.createDocumentFragment();
+
 	tabs.forEach((tab, tabIndex) => {
 		const tr = document.createElement('tr');
 
@@ -106,14 +108,14 @@ function updateVisibleTabs(query, preserveSelectedTabIndex) {
 		tdUrl.textContent = tab.url;
 		tr.appendChild(tdUrl);
 
-		// Store data attributes and add event listeners
+		// Store data attributes
 		tr.dataset.index = tabIndex;
 		tr.dataset.tabId = tab.id;
-		tr.addEventListener('click', () => setSelectedString(tabIndex));
-		tr.addEventListener('dblclick', () => activateTab());
 
-		tbody.appendChild(tr);
+		fragment.appendChild(tr);
 	});
+
+	tbody.appendChild(fragment);
 
 	// Highlight the selected tab
 	setSelectedString(tabIndex);
@@ -164,6 +166,8 @@ searchInput.addEventListener('input', event => {
 });
 
 enableQuickSwitch();
+
+setupTableEventListeners();
 
 window.addEventListener('keydown', event => {
 	const key = event.key;
@@ -380,4 +384,22 @@ async function closeTab() {
  */
 function getSelectedTabId() {
 	return selectedString ? parseInt(selectedString.dataset.tabId) : undefined;
+}
+
+function setupTableEventListeners() {
+	const tbody = document.querySelector('#tabs_table tbody');
+
+	tbody.addEventListener('click', (event) => {
+		const tr = event.target.closest('tr');
+		if (tr) {
+			setSelectedString(parseInt(tr.dataset.index));
+		}
+	});
+
+	tbody.addEventListener('dblclick', (event) => {
+		const tr = event.target.closest('tr');
+		if (tr) {
+			activateTab();
+		}
+	});
 }
