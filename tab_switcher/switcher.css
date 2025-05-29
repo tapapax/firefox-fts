@@ -15,39 +15,69 @@ body {
 	font-size: large;
 }
 
-#tabs_table__container {
+#tabs_container {
 	flex: 1;
-	overflow-y: scroll;
-}
-
-#tabs_table {
+	display: flex;
+	flex-direction: column;
 	width: 100%;
 	overflow: hidden;
-	white-space: nowrap;
-	text-overflow: ellipsis;
-	table-layout: fixed;
-	border: 0;
-	font-size: 14px;
 }
 
-#tabs_table td {
-	overflow: hidden;
-	text-overflow: ellipsis;
-	padding-top: 4px;
-	padding-bottom: 4px;
+.tabs_header {
+	display: flex;
+	width: 100%;
+	font-weight: bold;
+	background-color: #f0f0f0;
+	border-bottom: 1px solid #ddd;
+	padding: 4px 0;
+}
+
+#tabs_list {
+	flex: 1;
+	overflow-y: auto;
+	width: 100%;
+}
+
+.tab_item {
+	display: flex;
+	width: 100%;
+	padding: 4px 0;
 	cursor: default;
 	-moz-user-select: none;
+	border-bottom: 1px solid #f0f0f0;
 }
 
-.tabs_table__column_icon {
+/* Fixed column widths - mirroring table behavior */
+.tab_icon, .tab_icon_header {
 	width: 18px;
+	min-width: 18px;
+	max-width: 18px;
+	flex-shrink: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 
-.tabs_table__column_title {
+.tab_title, .tab_title_header {
 	width: 300px;
+	min-width: 300px;
+	max-width: 300px;
+	flex-shrink: 0;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	padding: 0 8px;
 }
 
-.tabs_table__selected {
+.tab_url, .tab_url_header {
+	flex: 1;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	padding: 0 8px;
+}
+
+.selected {
 	color: white;
 	background-color: #0A84FF;
 	border-color: #0A84FF;
